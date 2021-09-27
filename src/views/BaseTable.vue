@@ -14,7 +14,9 @@
                 <el-button type="primary" icon="" @click="handleOpen">新建</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
-                <el-table-column prop="id" label="ID" width="55" align="center"></el-table-column>
+                <el-table-column prop="id" label="ID" width="55" align="center">
+                  <template #default="scope">{{ scope.row.id }}</template>
+                </el-table-column>
                 <el-table-column prop="name" label="名称" align="center"></el-table-column>
                 <el-table-column label="地址" align="center">
                     <template #default="scope">{{ scope.row.address }}</template>
@@ -33,89 +35,100 @@
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
                         </el-button>
                         <el-button type="text" icon="el-icon-delete" class="red"
-                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                            @click="handleDelete(scope.row.id)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
             <div class="pagination">
-                <el-pagination background layout="total, prev, pager, next" :current-page="query.pageIndex"
-                    :page-size="query.pageSize" :total="pageTotal" @current-change="handlePageChange"></el-pagination>
+                <el-pagination background layout="total, prev, pager, next" :current-page="query.page"
+                    :page-size="query.num" :total="pageTotal" @current-change="handlePageChange"></el-pagination>
             </div>
         </div>
 
-        <!-- 编辑弹出框 -->
-        <el-dialog :title="title" v-model="editVisible" :rules="rules" width="30%">
-            <el-form label-width="70px">
-                <el-form-item label="名称">
-                    <el-input v-model="form.name"></el-input>
-                </el-form-item>
-                <el-form-item label="地址">
-                    <el-input v-model="form.address"></el-input>
-                </el-form-item>
-                <el-form-item label="端口">
-                    <el-input v-model="form.port"></el-input>
-                </el-form-item>
-                <el-form-item label="账号">
-                    <el-input v-model="form.user"></el-input>
-                </el-form-item>
-              <el-form-item label="密码">
-                <el-input v-model="form.password"></el-input>
-              </el-form-item>
-            </el-form>
-            <template #footer>
+      <!-- 编辑弹出框 -->
+      <el-dialog :title="title"  v-model="visible" width="30%">
+        <el-form label-width="70px" ref="createForm" :model="form" :rules="rules">
+          <el-form-item label="名称" prop="name">
+            <el-input v-model="form.name"></el-input>
+          </el-form-item>
+          <el-form-item label="地址" prop="address">
+            <el-input v-model="form.address"></el-input>
+          </el-form-item>
+          <el-form-item label="端口" prop="port">
+            <el-input v-model="form.port"></el-input>
+          </el-form-item>
+          <el-form-item label="账号" prop="user">
+            <el-input v-model="form.user"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="form.password"></el-input>
+          </el-form-item>
+        </el-form>
+        <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="editVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="saveEdit">确 定</el-button>
+                    <el-button @click="visible = false">取 消</el-button>
+                    <el-button type="primary" v-if="isNew" @click="handleCreate">创建</el-button>
+                    <el-button type="primary" v-else @click="saveEdit">确 定</el-button>
                 </span>
-            </template>
-        </el-dialog>
+        </template>
+      </el-dialog>
+
     </div>
 </template>
 
 <script>
 import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { fetchData } from "../api/index";
+import {fetchData, addEcs, editEcs, deleteEcs} from "../api/index";
 
 export default {
     name: "basetable",
     setup() {
         const query = reactive({
             address: "",
-            pageIndex: 1,
-            pageSize: 10,
+            page: 1,
+            num: 10,
         });
         const tableData = ref([]);
         const pageTotal = ref(0);
         // 获取表格数据
         const getData = () => {
             fetchData(query).then((res) => {
-                tableData.value = res.ecsList;
-                pageTotal.value = res.pageTotal || 50;
+                tableData.value = res.data.list;
+                pageTotal.value = res.data.count || 50;
             });
         };
         getData();
 
         // 查询操作
         const handleSearch = () => {
-            query.pageIndex = 1;
+            query.page = 1;
             getData();
         };
         // 分页导航
         const handlePageChange = (val) => {
-            query.pageIndex = val;
+            query.page = val;
             getData();
         };
 
         // 删除操作
-        const handleDelete = (index) => {
+        const handleDelete = (id) => {
             // 二次确认删除
             ElMessageBox.confirm("确定要删除吗？", "提示", {
                 type: "warning",
             })
                 .then(() => {
+                  deleteEcs({
+                    "id": id
+                  }).then((res)=> {
+                    if(res.code != 200 || res.errorCode != 0 ){
+                      ElMessage.error(res.errorMessage)
+                      return false;
+                    }
+                    getData();
                     ElMessage.success("删除成功");
-                    tableData.value.splice(index, 1);
+                    // tableData.value.splice(index, 1);
+                  })
                 })
                 .catch(() => {});
         };
@@ -137,9 +150,13 @@ export default {
           ],
         };
         // 表格编辑时弹窗和保存
-        const editVisible = ref(false);
-        const title = ref("编辑")
-        let form = reactive({
+        const visible = ref(false);
+        const createVisible = ref(false);
+        const createForm = ref(null);
+        const isNew = ref(false);
+        const title = ref("新建")
+        const form = reactive({
+            id: "",
             name: "",
             address: "",
             port: "",
@@ -148,36 +165,65 @@ export default {
         });
         let idx = -1;
         const handleEdit = (index, row) => {
+            title.value = "编辑";
             idx = index;
             Object.keys(form).forEach((item) => {
                 form[item] = row[item];
             });
-          title.value = "编辑"
-          editVisible.value = true;
+            isNew.value = false;
+            visible.value = true;
         };
         const saveEdit = () => {
-            editVisible.value = false;
-            ElMessage.success(`修改第 ${idx + 1} 行成功`);
-            Object.keys(form).forEach((item) => {
-                tableData.value[idx][item] = form[item];
-            });
+            editEcs(form).then((res) => {
+              if(res.code != 200 || res.errorCode != 0 ){
+                ElMessage.error(res.errorMessage)
+                return false;
+              }
+              getData();
+              ElMessage.success(`修改成功`);
+              visible.value = false;
+            })
         };
 
         const handleOpen = () => {
-          editVisible.value = true;
-          title.value = "新建"
+          //重置表单
+          Object.keys(form).forEach((item) => {
+            form[item] = "";
+          });
+
+          title.value = "新建";
+          isNew.value = true;
+          visible.value = true;
         };
 
         const handleCreate = () => {
-          editVisible.value = false;
+          createForm.value.validate((valid) => {
+            if (valid) {
+              form.port = parseInt(form.port)
+              addEcs(form).then((res)=>{
+                if(res.code != 200 || res.errorCode != 0 ){
+                  ElMessage.error(res.errorMessage)
+                  return false;
+                }
+                getData();
+                ElMessage.success("提交成功！");
+                visible.value = false;
+              })
+            } else {
+              return false;
+            }
+          });
         };
 
         return {
+            title,
             query,
             tableData,
             pageTotal,
-            editVisible,
-            title,
+            visible,
+            isNew,
+            createVisible,
+            createForm,
             form,
             rules,
             handleSearch,
