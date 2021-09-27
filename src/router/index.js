@@ -18,13 +18,41 @@ const routes = [
                 },
                 component: () => import ( /* webpackChunkName: "dashboard" */ "../views/Dashboard.vue")
             }, {
-                path: "/table",
+                path: "/ecs",
                 name: "basetable",
                 meta: {
-                    title: '表格'
+                    title: '服务器列表'
                 },
                 component: () => import ( /* webpackChunkName: "table" */ "../views/BaseTable.vue")
             }, {
+                path: "/project",
+                name: "project",
+                meta: {
+                    title: '项目列表'
+                },
+                component: () => import ( /* webpackChunkName: "charts" */ "../views/Project.vue")
+            }, {
+                path: "/notice",
+                name: "notice",
+                meta: {
+                    title: '通知列表'
+                },
+                component: () => import ( /* webpackChunkName: "charts" */ "../views/Notice.vue")
+            }, {
+                path: "/user",
+                name: "user",
+                meta: {
+                    title: '账号列表'
+                },
+                component: () => import ( /* webpackChunkName: "user" */ "../views/User.vue")
+            },{
+                path: "/publisher",
+                name: "publisher",
+                meta: {
+                    title: '项目发布'
+                },
+                component: () => import ( /* webpackChunkName: "publisher" */ "../views/Publisher.vue")
+            },{
                 path: "/charts",
                 name: "basecharts",
                 meta: {
@@ -96,12 +124,12 @@ const routes = [
                 },
                 component: () => import (/* webpackChunkName: "403" */ '../views/403.vue')
             }, {
-                path: '/user',
-                name: 'user',
+                path: '/personal',
+                name: 'personal',
                 meta: {
                     title: '个人中心'
                 },
-                component: () => import (/* webpackChunkName: "user" */ '../views/User.vue')
+                component: () => import (/* webpackChunkName: "personal" */ '../views/Personal.vue')
             }, {
                 path: '/editor',
                 name: 'editor',

@@ -5,7 +5,7 @@ const service = axios.create({
     // process.env.NODE_ENV === 'development' 来判断是否开发环境
     // easy-mock服务挂了，暂时不使用了
     baseURL: 'http://127.0.0.1:8002/',
-    timeout: 5000
+    timeout: 10000
 });
 
 service.interceptors.request.use(
@@ -13,6 +13,7 @@ service.interceptors.request.use(
         if (config.method === 'post' && config.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
             config.data = qs.stringify(config.data)
         }
+        config.headers["token"] = localStorage.getItem("ms_token");
         return config;
     },
     error => {

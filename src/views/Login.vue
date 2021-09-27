@@ -37,8 +37,8 @@ export default {
     setup() {
         const router = useRouter();
         const param = reactive({
-            username: "admin",
-            password: "123123",
+            username: "",
+            password: "",
         });
 
         const rules = {
@@ -59,7 +59,8 @@ export default {
                         return false;
                       }
                       ElMessage.success("登录成功");
-                      localStorage.setItem("ms_username", param.username);
+                      localStorage.setItem("ms_username", res.data.user);
+                      localStorage.setItem("ms_token", res.data.token);
                       router.push("/");
                     })
 

@@ -95,7 +95,7 @@ export default {
         const getData = () => {
             fetchData(query).then((res) => {
                 tableData.value = res.data.list;
-                pageTotal.value = res.data.count || 50;
+                pageTotal.value = res.data.count || 0;
             });
         };
         getData();
@@ -200,6 +200,7 @@ export default {
           createForm.value.validate((valid) => {
             if (valid) {
               form.port = parseInt(form.port)
+              form.id = parseInt(form.id)
               addEcs(form).then((res)=>{
                 if(res.code != 200 || res.errorCode != 0 ){
                   ElMessage.error(res.errorMessage)

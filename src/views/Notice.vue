@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 账号列表
+                    <i class="el-icon-lx-cascades"></i> 通知列表
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -17,32 +17,12 @@
                 <el-table-column prop="id" label="ID" width="80" align="center">
                   <template #default="scope">{{ scope.row.id }}</template>
                 </el-table-column>
-                <el-table-column prop="user" label="登录名" align="center"></el-table-column>
-                <el-table-column label="姓名" align="center">
-                    <template #default="scope">{{ scope.row.name }}</template>
+                <el-table-column prop="name" label="姓名" align="center"></el-table-column>
+                <el-table-column label="手机号" align="center">
+                    <template #default="scope">{{ scope.row.phone }}</template>
                 </el-table-column>
-              <el-table-column label="手机号" width="120" align="center">
-                <template #default="scope">{{ scope.row.phone }}</template>
-              </el-table-column>
-              <el-table-column label="职位" align="center">
-                <template #default="scope">{{ scope.row.job }}</template>
-              </el-table-column>
-              <el-table-column label="邮箱" width="250" align="center">
+              <el-table-column label="邮箱" align="center">
                 <template #default="scope">{{ scope.row.email }}</template>
-              </el-table-column>
-              <el-table-column label="邮箱秘钥" align="center">
-                <template #default="scope">{{ scope.row.emailKey }}</template>
-              </el-table-column>
-              <el-table-column label="密码" align="center">
-                <template #default="scope">{{ scope.row.password }}</template>
-              </el-table-column>
-              <el-table-column label="操作" width="180" align="center">
-                <template #default="scope">
-                  <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
-                  </el-button>
-                  <el-button type="text" icon="el-icon-delete" class="red"
-                             @click="handleDelete(scope.row.id)">删除</el-button>
-                </template>
               </el-table-column>
             </el-table>
             <div class="pagination">
@@ -54,26 +34,14 @@
       <!-- 编辑弹出框 -->
       <el-dialog :title="title"  v-model="visible" width="30%">
         <el-form label-width="80px" ref="createForm" :model="form" :rules="rules">
-          <el-form-item label="登录名" prop="user">
-            <el-input v-model="form.user"></el-input>
-          </el-form-item>
           <el-form-item label="姓名" prop="name">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
           <el-form-item label="手机号" prop="phone">
             <el-input v-model="form.phone"></el-input>
           </el-form-item>
-          <el-form-item label="职位" prop="job">
-            <el-input v-model="form.job"></el-input>
-          </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="form.email"></el-input>
-          </el-form-item>
-          <el-form-item label="邮箱秘钥" prop="emailKey">
-            <el-input v-model="form.emailKey"></el-input>
-          </el-form-item>
-          <el-form-item label="密码" prop="password">
-            <el-input v-model="form.password"></el-input>
           </el-form-item>
         </el-form>
         <template #footer>
@@ -91,10 +59,10 @@
 <script>
 import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import {getUser, addUser, editUser, deleteUser} from "../api/index";
+import {getNoticeUser, addNoticeUser, editNoticeUser, deleteNoticeUser} from "../api/index";
 
 export default {
-    name: "user",
+    name: "basetable",
     setup() {
         const query = reactive({
             name: "",
@@ -105,7 +73,7 @@ export default {
         const pageTotal = ref(0);
         // 获取表格数据
         const getData = () => {
-            getUser(query).then((res) => {
+            getNoticeUser(query).then((res) => {
                 tableData.value = res.data.list;
                 pageTotal.value = res.data.count || 0;
             });
@@ -130,7 +98,7 @@ export default {
                 type: "warning",
             })
                 .then(() => {
-                  deleteUser({
+                  deleteNoticeUser({
                     "id": id
                   }).then((res)=> {
                     if(res.code != 200 || res.errorCode != 0 ){
@@ -146,25 +114,13 @@ export default {
         };
         const rules = {
           name: [
-            { required: true, message: "请输入姓名", trigger: "blur" },
-          ],
-          user: [
-            { required: true, message: "请输入登录名", trigger: "blur" },
+            { required: true, message: "请输入名称", trigger: "blur" },
           ],
           phone: [
-            { required: true, message: "请输入手机号", trigger: "blur" },
-          ],
-          job: [
-            { required: true, message: "请输入职位", trigger: "blur" },
+            { required: true, message: "请输入地址", trigger: "blur" },
           ],
           email: [
-            { required: true, message: "请输入邮箱", trigger: "blur" },
-          ],
-          emailKey: [
-            { required: true, message: "请输入邮箱秘钥", trigger: "blur" },
-          ],
-          password: [
-            { required: true, message: "请输入密码", trigger: "blur" },
+            { required: true, message: "请输入端口", trigger: "blur" },
           ]
         };
         // 表格编辑时弹窗和保存
@@ -176,12 +132,8 @@ export default {
         const form = reactive({
             id: "",
             name: "",
-            user: "",
             phone: "",
             email: "",
-            emailKey: "",
-            password: "",
-            job: "",
         });
         let idx = -1;
         const handleEdit = (index, row) => {
@@ -194,7 +146,7 @@ export default {
             visible.value = true;
         };
         const saveEdit = () => {
-            editUser(form).then((res) => {
+            editNoticeUser(form).then((res) => {
               if(res.code != 200 || res.errorCode != 0 ){
                 ElMessage.error(res.errorMessage)
                 return false;
@@ -219,9 +171,8 @@ export default {
         const handleCreate = () => {
           createForm.value.validate((valid) => {
             if (valid) {
-              form.ecsId = parseInt(form.ecsId)
               form.id= parseInt(form.id)
-              addUser(form).then((res)=>{
+              addNoticeUser(form).then((res)=>{
                 if(res.code != 200 || res.errorCode != 0 ){
                   ElMessage.error(res.errorMessage)
                   return false;
