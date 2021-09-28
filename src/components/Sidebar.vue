@@ -49,6 +49,11 @@ export default {
             title: "项目发布",
           },
           {
+            icon: "el-icon-s-operation",
+            index: "/deployRecord",
+            title: "发布记录",
+          },
+          {
             icon: "el-icon-lx-cascades",
             index: "/ecs",
             title: "服务器列表",

@@ -1,4 +1,4 @@
-import {createRouter, createWebHashHistory} from "vue-router";
+import {createRouter, createWebHistory} from "vue-router";
 import Home from "../views/Home.vue";
 
 const routes = [
@@ -53,12 +53,12 @@ const routes = [
                 },
                 component: () => import ( /* webpackChunkName: "publisher" */ "../views/Publisher.vue")
             },{
-                path: "/charts",
-                name: "basecharts",
+                path: "/deployRecord",
+                name: "deployRecord",
                 meta: {
-                    title: '图表'
+                    title: '发布记录'
                 },
-                component: () => import ( /* webpackChunkName: "charts" */ "../views/BaseCharts.vue")
+                component: () => import ( /* webpackChunkName: "charts" */ "../views/DeployRecord.vue")
             }, {
                 path: "/tabs",
                 name: "tabs",
@@ -143,7 +143,7 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes
 });
 

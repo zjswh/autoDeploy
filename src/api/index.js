@@ -149,6 +149,22 @@ const publish = query => {
     });
 }
 
+const deployRecord = query => {
+    return request({
+        url: deploy.deployRecord,
+        method: 'get',
+        params: query
+    });
+}
+
+const loginRecord = query => {
+    return request({
+        url: deploy.loginRecord,
+        method: 'get',
+        params: query
+    });
+}
+
 export  {
     fetchData,
     login,
@@ -167,7 +183,9 @@ export  {
     addUser,
     editUser,
     deleteUser,
-    publish
+    publish,
+    loginRecord,
+    deployRecord
 }
 
 

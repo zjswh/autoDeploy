@@ -24,22 +24,21 @@
                 <el-card shadow="hover" style="height:403px;">
                     <template #header>
                         <div class="clearfix">
-                            <span>发布记录</span>
-                            <el-button style="float: right; padding: 3px 0" type="text">添加</el-button>
+                            <span>访问记录</span>
                         </div>
                     </template>
 
                     <el-table :show-header="false" :data="todoList" style="width:100%;">
-                        <el-table-column width="40">
-                            <template #default="scope">
-                                <el-checkbox v-model="scope.row.status"></el-checkbox>
-                            </template>
-                        </el-table-column>
+                        <el-table-column width="10"></el-table-column>
                         <el-table-column>
                             <template #default="scope">
-                                <div class="todo-item" :class="{
-                                        'todo-item-del': scope.row.status,
-                                    }">{{ scope.row.title }}</div>
+                                <div class="todo-item">
+                                  <span style="color: #00a854">{{ scope.row.user }} </span>
+                                  在
+                                  <span style="color: #00a854">{{ scope.row.loginAddress }} </span>
+                                  于
+                                  <span style="color: #00a854">{{ dateFormat(scope.row.createTime) }} </span>
+                                  访问了系统</div>
                             </template>
                         </el-table-column>
                         <el-table-column width="60">
@@ -56,45 +55,33 @@
 </template>
 
 <script>
-import Schart from "vue-schart";
-import { reactive } from "vue";
+import {ref} from "vue";
+import {loginRecord} from "../api/index";
+import {ElMessage} from "element-plus";
+import {dateFormat} from "../utils/time"
+
 export default {
     name: "dashboard",
-    components: { Schart },
     setup() {
         const name = localStorage.getItem("ms_username");
         const role = name === "admin" ? "超级管理员" : "普通用户";
-        const todoList = reactive([
-            {
-                title: "今天要修复100个bug",
-                status: false,
-            },
-            {
-                title: "今天要修复100个bug",
-                status: false,
-            },
-            {
-                title: "今天要写100行代码加几个bug吧",
-                status: false,
-            },
-            {
-                title: "今天要修复100个bug",
-                status: false,
-            },
-            {
-                title: "今天要修复100个bug",
-                status: true,
-            },
-            {
-                title: "今天要写100行代码加几个bug吧",
-                status: true,
-            },
-        ]);
+        const todoList = ref([]);
+        const getLoginRecord = () => {
+          loginRecord().then((res) => {
+            if(res.code != 200 || res.errorCode != 0 ){
+              ElMessage.error(res.errorMessage)
+              return false;
+            }
+            todoList.value = res.data
+          })
+        }
 
+        getLoginRecord()
         return {
             name,
             todoList,
             role,
+            dateFormat,
         };
     },
 };
