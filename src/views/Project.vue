@@ -11,7 +11,7 @@
             <div class="handle-box">
                 <el-input v-model="query.name" placeholder="项目名称" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="primary" icon="" @click="handleOpen">新建</el-button>
+                <el-button type="primary" icon="" style="float: right" @click="handleOpen">新建</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="id" label="ID" width="80" align="center">
@@ -25,7 +25,11 @@
                 <template #default="scope">{{ scope.row.type }}</template>
               </el-table-column>
               <el-table-column label="部署机器" align="center">
-                <template #default="scope">{{ scope.row.ecsId }}</template>
+<!--                <template #default="scope">{{ scope.row.ecsName }}</template>-->
+                <template #default="scope">
+                    <router-link :to="scope.row.ecsUrl">{{ scope.row.ecsName }}</router-link>
+                </template>
+
               </el-table-column>
               <el-table-column label="部署路径" align="center">
                 <template #default="scope">{{ scope.row.path }}</template>
@@ -58,20 +62,22 @@
             <el-input v-model="form.name"></el-input>
           </el-form-item>
           <el-form-item label="部署环境" prop="env">
-            <el-select v-model="form.env" placeholder="请选择">
+            <el-select v-model="form.env" placeholder="请选择" clearable>
               <el-option key="test" label="测试环境" value="test"></el-option>
               <el-option key="pre" label="预发环境" value="pre"></el-option>
               <el-option key="release" label="正式环境" value="release"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="部署方式" prop="type">
-            <el-select v-model="form.type" placeholder="请选择">
+            <el-select v-model="form.type" placeholder="请选择" clearable>
               <el-option key="ecs" label="ecs服务器" value="ecs"></el-option>
               <el-option key="k8s" label="k8s容器" value="k8s"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="部署机器" prop="ecsId">
-            <el-input v-model="form.ecsId"></el-input>
+            <el-select v-model="form.ecsId" placeholder="请选择" clearable>
+              <el-option v-for="item in ecsList" :key="item.ecsId" :label="item.name" :value="item.ecsId"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="部署路径" prop="path">
             <el-input v-model="form.path"></el-input>
@@ -98,25 +104,44 @@
 <script>
 import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import {getProject, addProject, editProject, deleteProject} from "../api/index";
+import {getProject, addProject, editProject, deleteProject, fetchData} from "../api/index";
 
 export default {
     name: "basetable",
     setup() {
-        const query = reactive({
+      const query = reactive({
             name: "",
             page: 1,
             num: 10,
         });
         const tableData = ref([]);
         const pageTotal = ref(0);
+        let ecsList = [];
+
+      //获取ecs列表
+        const getEcsList = () => {
+          fetchData().then((res)=> {
+            if(res.code != 200 || res.errorCode != 0 ){
+              ElMessage.error(res.errorMessage)
+              return false;
+            }
+            const list = res.data.list
+            for(let i=0;i<list.length;i++) {
+              ecsList.push({
+                "ecsId": list[i].id,
+                "name": list[i].name
+              })
+            }
+          })
+        }
+         getEcsList();
         // 获取表格数据
         const getData = () => {
             getProject(query).then((res) => {
-                tableData.value = res.data.list;
                 pageTotal.value = res.data.count || 0;
                 const list = res.data.list;
-                for(let i=0; i< list.length;i++) {
+
+              for(let i=0; i< list.length;i++) {
                   if(list[i].env == "test") {
                     list[i].env = "测试环境";
                   } else if (list[i].env == "pre") {
@@ -131,7 +156,12 @@ export default {
                   }else {
                     list[i].type = "其它";
                   }
-                }
+                  list[i].ecsUrl = ""
+                  if(list[i].ecsName != "") {
+                    list[i].ecsUrl = "/ecs?name=" + list[i].ecsName;
+                  }
+              }
+              tableData.value = list;
             });
         };
         getData();
@@ -146,6 +176,7 @@ export default {
             query.page = val;
             getData();
         };
+
 
         // 删除操作
         const handleDelete = (id) => {
@@ -191,6 +222,7 @@ export default {
             env: "",
             type: "",
             ecsId: "",
+            ecsName:"",
             path: "",
             branch: "",
             otherCmd: ""
@@ -249,6 +281,7 @@ export default {
         };
 
         return {
+            ecsList,
             title,
             query,
             tableData,
@@ -294,6 +327,7 @@ export default {
 .mr10 {
     margin-right: 10px;
 }
+
 .table-td-thumb {
     display: block;
     margin: auto;

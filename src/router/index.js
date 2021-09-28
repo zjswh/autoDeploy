@@ -19,11 +19,11 @@ const routes = [
                 component: () => import ( /* webpackChunkName: "dashboard" */ "../views/Dashboard.vue")
             }, {
                 path: "/ecs",
-                name: "basetable",
+                name: "ecs",
                 meta: {
                     title: '服务器列表'
                 },
-                component: () => import ( /* webpackChunkName: "table" */ "../views/BaseTable.vue")
+                component: () => import ( /* webpackChunkName: "table" */ "../views/Ecs.vue")
             }, {
                 path: "/project",
                 name: "project",
@@ -59,13 +59,6 @@ const routes = [
                     title: '图表'
                 },
                 component: () => import ( /* webpackChunkName: "charts" */ "../views/BaseCharts.vue")
-            }, {
-                path: "/form",
-                name: "baseform",
-                meta: {
-                    title: '表单'
-                },
-                component: () => import ( /* webpackChunkName: "form" */ "../views/BaseForm.vue")
             }, {
                 path: "/tabs",
                 name: "tabs",

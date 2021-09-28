@@ -44,7 +44,7 @@ export default {
             title: "系统首页",
           },
           {
-            icon: "el-icon-lx-cascades",
+            icon: "el-icon-s-operation",
             index: "/publisher",
             title: "项目发布",
           },
@@ -54,7 +54,7 @@ export default {
             title: "服务器列表",
           },
           {
-            icon: "el-icon-lx-cascades",
+            icon: "el-icon-star-off",
             index: "/project",
             title: "项目列表",
           },
@@ -64,12 +64,12 @@ export default {
             title: "通知列表",
           },
           {
-            icon: "el-icon-lx-emoji",
+            icon: "el-icon-user",
             index: "/user",
             title: "账号列表",
           },
           {
-            icon: "el-icon-lx-emoji",
+            icon: "el-icon-s-custom",
             index: "/personal",
             title: "个人中心",
           },

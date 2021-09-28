@@ -9,9 +9,10 @@
         </div>
         <div class="container">
             <div class="handle-box">
+                <el-input v-model="query.name" placeholder="名称" class="handle-input mr10"></el-input>
                 <el-input v-model="query.address" placeholder="ip地址" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="primary" icon="" @click="handleOpen">新建</el-button>
+                <el-button type="primary" icon=""  style="float: right" @click="handleOpen">新建</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="id" label="ID" width="55" align="center">
@@ -80,11 +81,15 @@
 import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {fetchData, addEcs, editEcs, deleteEcs} from "../api/index";
+import {useRoute} from "vue-router"
 
 export default {
     name: "basetable",
     setup() {
-        const query = reactive({
+      const route = useRoute()
+      const name = route.query.name
+      const query = reactive({
+            name: name,
             address: "",
             page: 1,
             num: 10,

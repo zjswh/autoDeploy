@@ -11,7 +11,7 @@
             <div class="handle-box">
                 <el-input v-model="query.name" placeholder="姓名" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="primary" icon="" @click="handleOpen">新建</el-button>
+                <el-button type="primary" style="float: right" icon="" @click="handleOpen">新建</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="id" label="ID" width="80" align="center">
@@ -114,13 +114,13 @@ export default {
         };
         const rules = {
           name: [
-            { required: true, message: "请输入名称", trigger: "blur" },
+            { required: true, message: "请输入姓名", trigger: "blur" },
           ],
           phone: [
-            { required: true, message: "请输入地址", trigger: "blur" },
+            { required: true, message: "请输入手机号", trigger: "blur" },
           ],
           email: [
-            { required: true, message: "请输入端口", trigger: "blur" },
+            { required: true, message: "请输入邮箱", trigger: "blur" },
           ]
         };
         // 表格编辑时弹窗和保存
