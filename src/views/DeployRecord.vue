@@ -16,14 +16,17 @@
                 <el-table-column label="发布环境" align="center">
                     <template #default="scope">{{ scope.row.env }}</template>
                 </el-table-column>
-              <el-table-column label="更新内容" align="center">
+              <el-table-column label="更新内容" >
                 <template #default="scope">{{ scope.row.updateInfo }}</template>
               </el-table-column>
-              <el-table-column label="部署结果" align="center">
-                <template #default="scope">{{ scope.row.status }}</template>
+              <el-table-column label="部署结果" align="center" >
+                <template #default="scope">
+                  <span v-if="scope.row.status== 1" style="color:green">成功</span>
+                  <span v-else style="color: red">失败</span>
+                </template>
               </el-table-column>
               <el-table-column label="发布时间" align="center">
-                <template #default="scope">{{ dateFormat(scope.row.createTime) }}</template>
+                <template #default="scope" style="color: red">{{ dateFormat(scope.row.createTime) }}</template>
               </el-table-column>
               <el-table-column label="部署详情" width="180" align="center">
                 <template #default="scope">
@@ -41,7 +44,7 @@
       <!-- 编辑弹出框 -->
       <el-dialog title="部署详情"  v-model="visible" width="60%">
         <el-form label-width="80px" :model="form">
-          <el-input type="textarea" rows="20" v-model="form.deployInfo" style="color:#00ff00;" disabled></el-input>
+          <el-input type="textarea" rows="20" v-model="form.deployInfo" disabled></el-input>
         </el-form>
       </el-dialog>
 
@@ -67,7 +70,7 @@ export default {
         // 获取表格数据
         const getData = () => {
             deployRecord(query).then((res) => {
-                tableData.value = res.data;
+                tableData.value = res.data.list;
                 pageTotal.value = res.data.count || 0;
             });
         };
@@ -108,6 +111,15 @@ export default {
 </script>
 
 <style scoped>
+
+::v-deep .el-table .cell {
+   white-space: pre-wrap;
+}
+
+::v-deep .el-textarea.is-disabled .el-textarea__inner {
+      color: #000;
+}
+
 .handle-box {
     margin-bottom: 20px;
 }
@@ -136,4 +148,6 @@ export default {
     width: 40px;
     height: 40px;
 }
+
+
 </style>

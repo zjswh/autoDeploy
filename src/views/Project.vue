@@ -19,13 +19,12 @@
                 </el-table-column>
                 <el-table-column prop="name" label="项目名称" align="center"></el-table-column>
                 <el-table-column label="部署环境" align="center">
-                    <template #default="scope">{{ scope.row.env }}</template>
+                    <template #default="scope">{{ scope.row.envName }}</template>
                 </el-table-column>
               <el-table-column label="部署方式" align="center">
-                <template #default="scope">{{ scope.row.type }}</template>
+                <template #default="scope">{{ scope.row.typeName }}</template>
               </el-table-column>
               <el-table-column label="部署机器" align="center">
-<!--                <template #default="scope">{{ scope.row.ecsName }}</template>-->
                 <template #default="scope">
                     <router-link :to="scope.row.ecsUrl">{{ scope.row.ecsName }}</router-link>
                 </template>
@@ -37,7 +36,7 @@
               <el-table-column label="使用分支" align="center">
                 <template #default="scope">{{ scope.row.branch }}</template>
               </el-table-column>
-              <el-table-column label="其它指令" align="center">
+              <el-table-column label="部署指令">
                 <template #default="scope">{{ scope.row.otherCmd }}</template>
               </el-table-column>
                 <el-table-column label="操作" width="180" align="center">
@@ -85,8 +84,8 @@
           <el-form-item label="使用分支" prop="branch">
             <el-input v-model="form.branch"></el-input>
           </el-form-item>
-          <el-form-item label="其它指令" prop="otherCmd">
-            <el-input v-model="form.otherCmd"></el-input>
+          <el-form-item label="部署指令" prop="otherCmd">
+            <el-input type="textarea" rows="5" v-model="form.otherCmd"></el-input>
           </el-form-item>
         </el-form>
         <template #footer>
@@ -143,18 +142,18 @@ export default {
 
               for(let i=0; i< list.length;i++) {
                   if(list[i].env == "test") {
-                    list[i].env = "测试环境";
+                    list[i].envName = "测试环境";
                   } else if (list[i].env == "pre") {
-                    list[i].env = "预发环境";
+                    list[i].envName = "预发环境";
                   }else {
-                    list[i].env = "正式环境";
+                    list[i].envName = "正式环境";
                   }
                   if(list[i].type == "ecs") {
-                    list[i].type = "ecs服务器";
+                    list[i].typeName = "ecs服务器";
                   } else if (list[i].type == "k8s") {
-                    list[i].type = "k8s容器";
+                    list[i].typeName = "k8s容器";
                   }else {
-                    list[i].type = "其它";
+                    list[i].typeName = "其它";
                   }
                   list[i].ecsUrl = ""
                   if(list[i].ecsName != "") {
@@ -305,6 +304,11 @@ export default {
 </script>
 
 <style scoped>
+
+::v-deep .el-table .cell {
+  white-space: pre-wrap;
+}
+
 .handle-box {
     margin-bottom: 20px;
 }

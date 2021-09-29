@@ -47,7 +47,7 @@ export default {
     setup() {
         const envList = [
           {"key": "test", "name":"测试环境"},
-          {"key": "pre", "name":"环境预发"},
+          {"key": "pre", "name":"预发环境"},
           {"key": "release", "name":"正式环境"},
         ];
         const isPublish = ref(false);
