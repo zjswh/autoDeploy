@@ -28,10 +28,12 @@
               <el-table-column label="发布时间" align="center">
                 <template #default="scope" style="color: red">{{ dateFormat(scope.row.createTime) }}</template>
               </el-table-column>
-              <el-table-column label="部署详情" width="180" align="center">
+              <el-table-column label="操作" width="180" align="center">
                 <template #default="scope">
                   <el-button type="text" icon="" @click="handleOpen(scope.$index, scope.row)">查看部署详情
                   </el-button>
+                  <el-button type="text" icon="el-icon-delete" class="red"
+                             @click="handleBack(scope.row.id)">回滚</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -54,7 +56,7 @@
 <script>
 import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import {deployRecord} from "../api/index";
+import {deployRecord, publishBack} from "../api/index";
 import {dateFormat} from "../utils/time"
 
 export default {
@@ -86,6 +88,7 @@ export default {
             query.page = val;
             getData();
         };
+
         const form = reactive({
           deployInfo: "",
         });
@@ -95,6 +98,26 @@ export default {
           });
           visible.value = true;
         };
+        const handleBack = (id) => {
+          // 二次确认删除
+          ElMessageBox.confirm("确定要回滚吗？", "提示", {
+            type: "warning",
+          })
+              .then(() => {
+                publishBack({
+                  "recordId": id
+                }).then((res)=> {
+                  if(res.code != 200 || res.errorCode != 0 ){
+                    ElMessage.error(res.errorMessage)
+                    return false;
+                  }
+                  getData();
+                  ElMessage.success("操作成功");
+                })
+              })
+              .catch(() => {});
+        };
+
         return {
             form,
             visible,
@@ -105,6 +128,7 @@ export default {
             dateFormat,
             handleSearch,
             handlePageChange,
+            handleBack,
         };
     },
 };

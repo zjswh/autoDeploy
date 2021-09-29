@@ -149,6 +149,15 @@ const publish = query => {
     });
 }
 
+const publishBack = query => {
+    return request({
+        url: deploy.publishBack,
+        method: 'post',
+        data: query,
+        headers: { 'Content-Type': "application/x-www-form-urlencoded" }
+    });
+}
+
 const deployRecord = query => {
     return request({
         url: deploy.deployRecord,
@@ -184,6 +193,7 @@ export  {
     editUser,
     deleteUser,
     publish,
+    publishBack,
     loginRecord,
     deployRecord
 }
