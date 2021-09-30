@@ -76,7 +76,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="部署机器" prop="ecsId">
-            <el-select v-model="form.ecsId" placeholder="请选择" clearable>
+            <el-select multiple  v-model="form.ecsId" placeholder="请选择" clearable>
               <el-option v-for="item in ecsList" :key="item.ecsId" :label="item.name" :value="item.ecsId"></el-option>
             </el-select>
           </el-form-item>
@@ -384,7 +384,6 @@ export default {
         const handleCreate = () => {
           createForm.value.validate((valid) => {
             if (valid) {
-              form.ecsId = parseInt(form.ecsId)
               form.id= parseInt(form.id)
               addProject(form).then((res)=>{
                 if(res.code != 200 || res.errorCode != 0 ){
