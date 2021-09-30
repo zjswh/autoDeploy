@@ -44,9 +44,9 @@ export default {
             title: "系统首页",
           },
           {
-            icon: "el-icon-s-operation",
-            index: "/publisher",
-            title: "项目发布",
+            icon: "el-icon-star-off",
+            index: "/project",
+            title: "项目列表",
           },
           {
             icon: "el-icon-s-operation",
@@ -57,11 +57,6 @@ export default {
             icon: "el-icon-lx-cascades",
             index: "/ecs",
             title: "服务器列表",
-          },
-          {
-            icon: "el-icon-star-off",
-            index: "/project",
-            title: "项目列表",
           },
           {
             icon: "el-icon-lx-copy",

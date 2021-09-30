@@ -20,17 +20,17 @@
                           <el-option v-for="item in envList" :key="item.key" :label="item.name" :value="item.key"></el-option>
                         </el-select>
                     </el-form-item>
-                  <el-form-item label="通知列表" prop="noticeUserId">
-                    <el-select v-model="form.noticeUserId" placeholder="请选择" clearable>
-                      <el-option v-for="item in noticeUserList" :key="item.id" :label="item.key" :value="item.id"></el-option>
-                    </el-select>
-                  </el-form-item>
-                    <el-form-item label="更新内容" prop="updateInfo">
-                        <el-input type="textarea" rows="5" v-model="form.updateInfo"></el-input>
+                    <el-form-item label="通知列表" prop="noticeUserId">
+                      <el-select v-model="form.noticeUserId" placeholder="请选择" clearable>
+                        <el-option v-for="item in noticeUserList" :key="item.id" :label="item.key" :value="item.id"></el-option>
+                      </el-select>
                     </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary" @click="onSubmit" :disabled="isPublish" :icon="buttonIcon">{{ buttonName }}</el-button>
-                    </el-form-item>
+                      <el-form-item label="更新内容" prop="updateInfo">
+                          <el-input type="textarea" rows="5" v-model="form.updateInfo"></el-input>
+                      </el-form-item>
+                      <el-form-item>
+                          <el-button type="primary" @click="onSubmit" :disabled="isPublish" :icon="buttonIcon">{{ buttonName }}</el-button>
+                      </el-form-item>
                 </el-form>
             </div>
         </div>

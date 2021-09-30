@@ -14,7 +14,7 @@
                 </el-table-column>
                 <el-table-column prop="projectName" label="项目名" align="center"></el-table-column>
                 <el-table-column label="发布环境" align="center">
-                    <template #default="scope">{{ scope.row.env }}</template>
+                    <template #default="scope">{{ scope.row.envName }}</template>
                 </el-table-column>
               <el-table-column label="更新内容" >
                 <template #default="scope">{{ scope.row.updateInfo }}</template>
@@ -22,7 +22,7 @@
               <el-table-column label="部署结果" align="center" >
                 <template #default="scope">
                   <span v-if="scope.row.status== 1" style="color:green">成功</span>
-                  <span v-else style="color: red">失败</span>
+                  <span v-else style="color: red">已回滚</span>
                 </template>
               </el-table-column>
               <el-table-column label="发布时间" align="center">
@@ -32,7 +32,7 @@
                 <template #default="scope">
                   <el-button type="text" icon="" @click="handleOpen(scope.$index, scope.row)">查看部署详情
                   </el-button>
-                  <el-button type="text" icon="el-icon-delete" class="red"
+                  <el-button type="text" icon="el-icon-delete" v-show="scope.row.status" class="red"
                              @click="handleBack(scope.row.id)">回滚</el-button>
                 </template>
               </el-table-column>
@@ -72,8 +72,18 @@ export default {
         // 获取表格数据
         const getData = () => {
             deployRecord(query).then((res) => {
-                tableData.value = res.data.list;
-                pageTotal.value = res.data.count || 0;
+                let list = res.data.list;
+                for(let i=0; i< list.length;i++) {
+                  if(list[i].env == "test") {
+                    list[i].envName = "测试环境";
+                  } else if (list[i].env == "pre") {
+                    list[i].envName = "预发环境";
+                  }else {
+                    list[i].envName = "正式环境";
+                  }
+                }
+              tableData.value = list;
+              pageTotal.value = res.data.count || 0;
             });
         };
         getData();
@@ -111,8 +121,8 @@ export default {
                     ElMessage.error(res.errorMessage)
                     return false;
                   }
-                  getData();
                   ElMessage.success("操作成功");
+                  getData();
                 })
               })
               .catch(() => {});
