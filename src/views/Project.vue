@@ -26,7 +26,8 @@
               </el-table-column>
               <el-table-column label="部署机器" align="center">
                 <template #default="scope">
-                    <router-link :to="scope.row.ecsUrl">{{ scope.row.ecsName }}</router-link>
+                  {{ scope.row.ecsName }}
+<!--                    <router-link :to="scope.row.ecsUrl">{{ scope.row.ecsName }}</router-link>-->
                 </template>
 
               </el-table-column>
@@ -191,8 +192,8 @@ export default {
                     list[i].typeName = "其它";
                   }
                   list[i].ecsUrl = ""
-                  if(list[i].ecsName != "") {
-                    list[i].ecsUrl = "/ecs?name=" + list[i].ecsName;
+                  if(list[i].type === "ecs") {
+                    list[i].ecsId = JSON.parse(list[i].ecsId);
                   }
               }
               tableData.value = list;

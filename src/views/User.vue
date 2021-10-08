@@ -15,7 +15,7 @@
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="id" label="ID" width="80" align="center">
-                  <template #default="scope">{{ scope.row.id }}</template>
+                  <template #default="scope">{{  scope.$index + 1  }}</template>
                 </el-table-column>
                 <el-table-column prop="user" label="登录名" align="center"></el-table-column>
                 <el-table-column label="姓名" align="center">

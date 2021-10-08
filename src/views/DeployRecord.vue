@@ -10,7 +10,7 @@
         <div class="container">
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="id" label="ID" width="80" align="center">
-                  <template #default="scope">{{ scope.row.id }}</template>
+                  <template #default="scope">{{  scope.$index + 1  }}</template>
                 </el-table-column>
                 <el-table-column prop="projectName" label="项目名" align="center"></el-table-column>
                 <el-table-column label="发布环境" align="center">
@@ -21,7 +21,10 @@
               </el-table-column>
               <el-table-column label="部署结果" align="center" >
                 <template #default="scope">
-                  <span v-if="scope.row.status== 1" style="color:green">成功</span>
+                  <span v-if="scope.row.status == 1" style="color:green">成功</span>
+                  <span v-else-if="scope.row.status == 0" style="color:green">部署中</span>
+                  <span v-else-if="scope.row.status == 3" style="color:red">失败</span>
+                  <span v-else-if="scope.row.status == 4" style="color:red">回滚失败</span>
                   <span v-else style="color: red">已回滚</span>
                 </template>
               </el-table-column>
@@ -32,7 +35,7 @@
                 <template #default="scope">
                   <el-button type="text" icon="" @click="handleOpen(scope.$index, scope.row)">查看部署详情
                   </el-button>
-                  <el-button type="text" icon="el-icon-delete" v-show="scope.row.status" class="red"
+                  <el-button type="text" icon="el-icon-delete" v-show="scope.row.status == 1" class="red"
                              @click="handleBack(scope.row.id)">回滚</el-button>
                 </template>
               </el-table-column>
@@ -58,10 +61,51 @@ import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {deployRecord, publishBack} from "../api/index";
 import {dateFormat} from "../utils/time"
+import ROP from "../utils/Rop";
 
 export default {
     name: "deployRecord",
     setup() {
+      const DMSInit = (key, topic) => {
+        ROP.Leave()
+        const token = "123121"
+        const ramdomNum = String(Math.floor(Math.random() * 666666) + new Date().getTime())
+        const clientId = token + '_' + ramdomNum
+        ROP.Enter('', key, clientId, true)
+
+        // chat连接成功后的消息
+        ROP.On('enter_suc', function () {
+          console.info('DMS:服务器连接成功')
+          ROP.Subscribe(topic)
+        })
+        ROP.On('reconnect', err => {
+          console.warn('DMS:重连', err)
+        })
+        // chat连接失败后的消息
+        ROP.On('enter_fail', err => {
+          console.error('DMS:服务器连接失败', err)
+        })
+        // chat接收到的消息
+        ROP.On('publish_data', (str, topic) => {
+          const data = JSON.parse(str)
+          switch (topic) {
+            case "autoDeploy":
+              if (data.cmd === 'finished') {
+                //更新数据
+                getData()
+              }
+              break
+            default:
+              break
+          }
+        })
+        // chat断开连接后的消息
+        ROP.On('losed', function () {
+          console.info('DMS:服务器断开连接')
+        })
+      }
+
+      DMSInit("sub_44d39b3f0437968dbcabc8b8a2cee707", "autoDeploy")
         const query = reactive({
             page: 1,
             num: 10,
@@ -134,6 +178,7 @@ export default {
             query,
             tableData,
             pageTotal,
+            DMSInit,
             handleOpen,
             dateFormat,
             handleSearch,
