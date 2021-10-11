@@ -16,8 +16,13 @@ export const deploy = {
     userAdd: `/api/service/userAdd`,
     userEdit: `/api/service/userEdit`,
     userDelete: `/api/service/userDelete`,
+    updateAva: `/api/service/updateAva`,
+    saveUserInfo:`/api/service/saveUserInfo`,
     publish: `/api/service/publish`,
     publishBack: `/api/service/publishBack`,
     loginRecord: `/api/service/getLoginRecord`,
     deployRecord: `/api/service/getDeployRecord`,
+    getSystemConfig: `/api/service/getSystemConfig`,
+    getLoginInfo: `/api/service/getLoginInfo`,
+    updateConfig: `/api/service/updateSystemConfig`,
 }

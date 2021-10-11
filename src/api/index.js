@@ -158,6 +158,31 @@ const publishBack = query => {
     });
 }
 
+const updateConfig = query => {
+    return request({
+        url: deploy.updateConfig,
+        method: 'post',
+        data: query,
+    });
+}
+
+const updateAva = query => {
+    return request({
+        url: deploy.updateAva,
+        method: 'post',
+        data: query,
+        headers: { 'Content-Type': "application/x-www-form-urlencoded" }
+    });
+}
+
+const saveUserInfoApi = query => {
+    return request({
+        url: deploy.saveUserInfo,
+        method: 'post',
+        data: query,
+    });
+}
+
 const deployRecord = query => {
     return request({
         url: deploy.deployRecord,
@@ -171,6 +196,21 @@ const loginRecord = query => {
         url: deploy.loginRecord,
         method: 'get',
         params: query
+    });
+}
+
+const getSystemConfig = query => {
+    return request({
+        url: deploy.getSystemConfig,
+        method: 'get',
+        params: query
+    });
+}
+
+const getLoginInfo = () => {
+    return request({
+        url: deploy.getLoginInfo,
+        method: 'get',
     });
 }
 
@@ -195,7 +235,12 @@ export  {
     publish,
     publishBack,
     loginRecord,
-    deployRecord
+    deployRecord,
+    getSystemConfig,
+    getLoginInfo,
+    updateConfig,
+    updateAva,
+    saveUserInfoApi
 }
 
 

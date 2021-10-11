@@ -19,7 +19,7 @@
                 </div>
                 <!-- 用户头像 -->
                 <div class="user-avator">
-                    <img src="../assets/img/img.jpg" />
+                    <img :src="avatar" />
                 </div>
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
@@ -29,10 +29,6 @@
                     </span>
                     <template #dropdown>
                         <el-dropdown-menu>
-                            <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
-                                <el-dropdown-item>项目仓库</el-dropdown-item>
-                            </a>
-                            <el-dropdown-item command="user">个人中心</el-dropdown-item>
                             <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
@@ -42,13 +38,16 @@
     </div>
 </template>
 <script>
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import {getLoginInfo} from "../api/index";
+import {ElMessage} from "element-plus";
 export default {
     setup() {
-        const username = localStorage.getItem("ms_username");
         const message = 2;
+        let avatar = ref("");
+        let username = ref("");
 
         const store = useStore();
         const collapse = computed(() => store.state.collapse);
@@ -75,7 +74,20 @@ export default {
             }
         };
 
+        const getLogin = () => {
+          getLoginInfo().then((res) => {
+            if(res.code != 200 || res.errorCode != 0 ){
+              ElMessage.error(res.errorMessage);
+              return false;
+            }
+            avatar.value = res.data.ava
+            username.value = res.data.user
+          })
+        }
+        getLogin()
+
         return {
+            avatar,
             username,
             message,
             collapse,

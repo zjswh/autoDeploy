@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-row :gutter="20">
-            <el-col :span="12">
+            <el-col>
                 <el-card shadow="hover">
                     <template #header>
                         <div class="clearfix">
@@ -16,34 +16,52 @@
                             </span>
                         </div>
                         <div class="info-name">{{ name }}</div>
-                        <div class="info-desc">不可能！我的代码怎么可能会有bug！</div>
+
+                        <el-form label-width="100px" :rules="rules" :model="userForm" ref="initForm" >
+                          <el-form-item label="姓名" prop="name">
+                            <el-input v-model="userForm.name"> </el-input>
+                          </el-form-item>
+                          <el-form-item label="手机号" prop="phone">
+                            <el-input v-model="userForm.phone"></el-input>
+                          </el-form-item>
+                          <el-form-item label="邮箱" prop="email">
+                            <el-input v-model="userForm.email"></el-input>
+                          </el-form-item>
+                          <el-form-item label="邮箱密钥" prop="emailKey">
+                            <el-input v-model="userForm.emailKey"></el-input>
+                          </el-form-item>
+                          <el-form-item label="职位" prop="job">
+                            <el-input v-model="userForm.job"></el-input>
+                          </el-form-item>
+                          <el-form-item>
+                            <el-button type="primary"  @click="saveUserInfo">保存</el-button>
+                          </el-form-item>
+                        </el-form>
+
                     </div>
                 </el-card>
             </el-col>
-            <el-col :span="12">
-                <el-card shadow="hover">
-                    <template #header>
-                        <div class="clearfix">
-                            <span>账户编辑</span>
-                        </div>
-                    </template>
-                    <el-form label-width="90px">
-                        <el-form-item label="用户名："> {{ name }} </el-form-item>
-                        <el-form-item label="旧密码：">
-                            <el-input type="password" v-model="form.old"></el-input>
-                        </el-form-item>
-                        <el-form-item label="新密码：">
-                            <el-input type="password" v-model="form.new"></el-input>
-                        </el-form-item>
-                        <el-form-item label="个人简介：">
-                            <el-input v-model="form.desc"></el-input>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="onSubmit">保存</el-button>
-                        </el-form-item>
-                    </el-form>
-                </el-card>
-            </el-col>
+<!--            <el-col :span="12">-->
+<!--                <el-card shadow="hover">-->
+<!--                    <template #header>-->
+<!--                        <div class="clearfix">-->
+<!--                            <span>账户编辑</span>-->
+<!--                        </div>-->
+<!--                    </template>-->
+<!--                    <el-form label-width="90px">-->
+<!--                        <el-form-item label="用户名："> {{ name }} </el-form-item>-->
+<!--                        <el-form-item label="旧密码：">-->
+<!--                            <el-input type="password" v-model="form.old"></el-input>-->
+<!--                        </el-form-item>-->
+<!--                        <el-form-item label="新密码：">-->
+<!--                            <el-input type="password" v-model="form.new"></el-input>-->
+<!--                        </el-form-item>-->
+<!--                        <el-form-item>-->
+<!--                            <el-button type="primary" @click="onSubmit">保存</el-button>-->
+<!--                        </el-form-item>-->
+<!--                    </el-form>-->
+<!--                </el-card>-->
+<!--            </el-col>-->
         </el-row>
         <el-dialog title="裁剪图片" v-model="dialogVisible" width="600px">
             <vue-cropper ref="cropper" :src="imgSrc" :ready="cropImage" :zoom="cropImage" :cropmove="cropImage"
@@ -66,21 +84,68 @@ import { reactive, ref } from "vue";
 import VueCropper from "vue-cropperjs";
 import "cropperjs/dist/cropper.css";
 import avatar from "../assets/img/img.jpg";
+import {getLoginInfo, updateAva, saveUserInfoApi} from "../api/index";
+import {ElMessage} from "element-plus";
+
+
 export default {
     name: "user",
     components: {
         VueCropper,
     },
     setup() {
-        const name = localStorage.getItem("ms_username");
+        const name = ref("");
         const form = reactive({
             old: "",
             new: "",
-            desc: "不可能！我的代码怎么可能会有bug！",
         });
-        const onSubmit = () => {};
+        const initForm = ref(null);
+        const userForm = reactive({
+          "name": "",
+          "phone": "",
+          "email": "",
+          "emailKey": "",
+          "job": "",
+        });
+
+        const rules = {
+          name: [
+            { required: true, message: "请输入姓名", trigger: "blur" },
+          ],
+          phone: [
+            { required: true, message: "请输入手机号", trigger: "blur" },
+          ],
+          email: [
+            { required: true, message: "请输入邮箱", trigger: "blur" },
+          ],
+          emailKey: [
+            { required: true, message: "请输入邮箱密钥", trigger: "blur" },
+          ],
+          job: [
+            { required: true, message: "请输入职位", trigger: "blur" },
+          ]
+        };
 
         const avatarImg = ref(avatar);
+
+        const getLogin = () => {
+          getLoginInfo().then((res) => {
+            if(res.code != 200 || res.errorCode != 0 ){
+              ElMessage.error(res.errorMessage);
+              return false;
+            }
+            avatarImg.value = res.data.ava
+            name.value = res.data.user
+            Object.keys(userForm).forEach((item) => {
+              userForm[item] = res.data[item]
+            })
+            userForm.emailKey = "***************"
+          })
+        }
+        getLogin()
+
+        const onSubmit = () => {};
+
         const imgSrc = ref("");
         const cropImg = ref("");
         const dialogVisible = ref(false);
@@ -110,13 +175,42 @@ export default {
         };
 
         const saveAvatar = () => {
-            avatarImg.value = cropImg.value;
-            dialogVisible.value = false;
+            updateAva({
+              "ava": cropImg.value
+            }).then((res)=>{
+              if(res.code != 200 || res.errorCode != 0 ){
+                ElMessage.error(res.errorMessage);
+                return false;
+              }
+              ElMessage.success("上传成功");
+              avatarImg.value = cropImg.value;
+              dialogVisible.value = false;
+            })
         };
 
+        const saveUserInfo = () => {
+          initForm.value.validate((valid) => {
+            if(valid) {
+              saveUserInfoApi(userForm).then((res)=>{
+                if(res.code != 200 || res.errorCode != 0 ){
+                  ElMessage.error(res.errorMessage)
+                  return false;
+                }
+                ElMessage.success("修改成功");
+                getLogin();
+              })
+            }else {
+              return false;
+            }
+          })
+        }
+
         return {
+            initForm,
+            rules,
             name,
             form,
+            userForm,
             onSubmit,
             cropper,
             avatarImg,
@@ -127,12 +221,20 @@ export default {
             setImage,
             cropImage,
             saveAvatar,
+            saveUserInfo
         };
     },
 };
 </script>
 
 <style scoped>
+::v-deep .el-form-item {
+  display: flex;
+  margin-bottom: 22px;
+  width: 400px;
+  margin-left: 30%;
+}
+
 .info {
     text-align: center;
     padding: 35px 0;

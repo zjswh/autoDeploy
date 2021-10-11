@@ -60,6 +60,13 @@ const routes = [
                 },
                 component: () => import ( /* webpackChunkName: "charts" */ "../views/DeployRecord.vue")
             }, {
+                path: "/system",
+                name: "system",
+                meta: {
+                    title: '系统设置'
+                },
+                component: () => import ( /* webpackChunkName: "charts" */ "../views/System.vue")
+            }, {
                 path: "/tabs",
                 name: "tabs",
                 meta: {

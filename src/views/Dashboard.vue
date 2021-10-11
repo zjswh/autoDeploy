@@ -4,7 +4,7 @@
             <el-col :span="8">
                 <el-card shadow="hover" class="mgb20" style="height:403px;">
                     <div class="user-info">
-                        <img src="../assets/img/img.jpg" class="user-avator" alt />
+                        <img :src="avatar" class="user-avator" alt />
                         <div class="user-info-cont">
                             <div class="user-info-name">{{ name }}</div>
                             <div>{{ role }}</div>
@@ -12,11 +12,7 @@
                     </div>
                     <div class="user-info-list">
                         上次登录时间：
-                        <span>2019-11-01</span>
-                    </div>
-                    <div class="user-info-list">
-                        上次登录地点：
-                        <span>东莞</span>
+                        <span>{{ dateFormat(lastLoginTime) }}</span>
                     </div>
                 </el-card>
             </el-col>
@@ -34,8 +30,6 @@
                             <template #default="scope">
                                 <div class="todo-item">
                                   <span style="color: #00a854">{{ scope.row.user }} </span>
-                                  在
-                                  <span style="color: #00a854">{{ scope.row.loginAddress }} </span>
                                   于
                                   <span style="color: #00a854">{{ dateFormat(scope.row.createTime) }} </span>
                                   访问了系统</div>
@@ -56,7 +50,7 @@
 
 <script>
 import {ref} from "vue";
-import {loginRecord} from "../api/index";
+import {getLoginInfo, loginRecord} from "../api/index";
 import {ElMessage} from "element-plus";
 import {dateFormat} from "../utils/time"
 
@@ -64,8 +58,24 @@ export default {
     name: "dashboard",
     setup() {
         const name = localStorage.getItem("ms_username");
-        const role = name === "admin" ? "超级管理员" : "普通用户";
         const todoList = ref([]);
+        let lastLoginTime = ref("")
+        let role = ref("");
+        let avatar = ref("");
+
+        const getLogin = () => {
+          getLoginInfo().then((res) => {
+            if(res.code != 200 || res.errorCode != 0 ){
+              ElMessage.error(res.errorMessage);
+              return false;
+            }
+            role.value = res.data.isAdmin === 1 ? "超级管理员" : "普通用户";
+            lastLoginTime.value = res.data.lastLoginTime
+            avatar.value = res.data.ava
+
+          })
+        }
+      getLogin()
         const getLoginRecord = () => {
           loginRecord().then((res) => {
             if(res.code != 200 || res.errorCode != 0 ){
@@ -78,10 +88,13 @@ export default {
 
         getLoginRecord()
         return {
+            avatar,
+            lastLoginTime,
             name,
             todoList,
             role,
             dateFormat,
+            getLogin
         };
     },
 };

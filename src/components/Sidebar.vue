@@ -69,6 +69,11 @@ export default {
             title: "账号列表",
           },
           {
+            icon: "el-icon-s-tools",
+            index: "/system",
+            title: "系统设置",
+          },
+          {
             icon: "el-icon-s-custom",
             index: "/personal",
             title: "个人中心",

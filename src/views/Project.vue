@@ -386,6 +386,9 @@ export default {
           createForm.value.validate((valid) => {
             if (valid) {
               form.id= parseInt(form.id)
+              if(form.ecsId == "") {
+                form.ecsId = [];
+              }
               addProject(form).then((res)=>{
                 if(res.code != 200 || res.errorCode != 0 ){
                   ElMessage.error(res.errorMessage)
