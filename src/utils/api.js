@@ -1,3 +1,5 @@
+import {getMenu} from "../api";
+
 export const deploy = {
     login: `/api/service/login`,
     ecsList: `/api/service/ecsList`,
@@ -25,4 +27,6 @@ export const deploy = {
     getSystemConfig: `/api/service/getSystemConfig`,
     getLoginInfo: `/api/service/getLoginInfo`,
     updateConfig: `/api/service/updateSystemConfig`,
+    updatePassword: `/api/service/updatePassword`,
+    getMenu: `/api/service/getMenu`,
 }

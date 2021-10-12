@@ -183,6 +183,15 @@ const saveUserInfoApi = query => {
     });
 }
 
+const updatePassword = query => {
+    return request({
+        url: deploy.updatePassword,
+        method: 'post',
+        data: query,
+        headers: { 'Content-Type': "application/x-www-form-urlencoded" }
+    });
+}
+
 const deployRecord = query => {
     return request({
         url: deploy.deployRecord,
@@ -214,6 +223,14 @@ const getLoginInfo = () => {
     });
 }
 
+const getMenu = () => {
+    return request({
+        url: deploy.getMenu,
+        method: 'get',
+    });
+}
+
+
 export  {
     fetchData,
     login,
@@ -240,7 +257,9 @@ export  {
     getLoginInfo,
     updateConfig,
     updateAva,
-    saveUserInfoApi
+    saveUserInfoApi,
+    updatePassword,
+    getMenu
 }
 
 

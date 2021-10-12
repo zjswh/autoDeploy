@@ -7,8 +7,8 @@ import {useRouter} from "vue-router";
 const service = axios.create({
     // process.env.NODE_ENV === 'development' 来判断是否开发环境
     // easy-mock服务挂了，暂时不使用了
-    baseURL: 'http://127.0.0.1:8002/',
-    timeout: 10000
+    baseURL: process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:8002/' : '',
+    timeout: 3000
 });
 
 service.interceptors.request.use(

@@ -2,7 +2,7 @@
     <div class="sidebar">
         <el-menu class="sidebar-el-menu" :default-active="onRoutes" :collapse="collapse" background-color="#324157"
             text-color="#bfcbd9" active-text-color="#20a0ff" unique-opened router>
-            <template v-for="item in items">
+            <template v-for="item in menu">
                 <template v-if="item.subs">
                     <el-submenu :index="item.index" :key="item.index">
                         <template #title>
@@ -32,125 +32,83 @@
 </template>
 
 <script>
-import { computed, watch } from "vue";
+import { computed, watch, ref } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
+import {getMenu} from "../api/index"
+import {ElMessage} from "element-plus";
 export default {
     setup() {
-        const items = [
-          {
-            icon: "el-icon-lx-home",
-            index: "/dashboard",
-            title: "系统首页",
-          },
-          {
-            icon: "el-icon-star-off",
-            index: "/project",
-            title: "项目列表",
-          },
-          {
-            icon: "el-icon-s-operation",
-            index: "/deployRecord",
-            title: "发布记录",
-          },
-          {
-            icon: "el-icon-lx-cascades",
-            index: "/ecs",
-            title: "服务器列表",
-          },
-          {
-            icon: "el-icon-lx-copy",
-            index: "/notice",
-            title: "通知列表",
-          },
-          {
-            icon: "el-icon-user",
-            index: "/user",
-            title: "账号列表",
-          },
-          {
-            icon: "el-icon-s-tools",
-            index: "/system",
-            title: "系统设置",
-          },
-          {
-            icon: "el-icon-s-custom",
-            index: "/personal",
-            title: "个人中心",
-          },
-            // {
-            //     icon: "el-icon-lx-calendar",
-            //     index: "3",
-            //     title: "表单相关",
-            //     subs: [
-            //         {
-            //             index: "/form",
-            //             title: "基本表单",
-            //         },
-            //         {
-            //             index: "/upload",
-            //             title: "文件上传",
-            //         },
-            //         {
-            //             index: "4",
-            //             title: "三级菜单",
-            //             subs: [
-            //                 {
-            //                     index: "/editor",
-            //                     title: "富文本编辑器",
-            //                 },
-            //             ],
-            //         },
-            //     ],
-            // },
-            // {
-            //     icon: "el-icon-lx-emoji",
-            //     index: "/icon",
-            //     title: "自定义图标",
-            // },
-            // {
-            //     icon: "el-icon-pie-chart",
-            //     index: "/charts",
-            //     title: "schart图表",
-            // },
-            // {
-            //     icon: "el-icon-lx-global",
-            //     index: "/i18n",
-            //     title: "国际化功能",
-            // },
-            // {
-            //     icon: "el-icon-lx-warn",
-            //     index: "7",
-            //     title: "错误处理",
-            //     subs: [
-            //         {
-            //             index: "/permission",
-            //             title: "权限测试",
-            //         },
-            //         {
-            //             index: "/404",
-            //             title: "404页面",
-            //         },
-            //     ],
-            // },
-            // {
-            //     icon: "el-icon-lx-redpacket_fill",
-            //     index: "/donate",
-            //     title: "支持作者",
-            // },
-        ];
-
+        const menu = ref([]);
         const route = useRoute();
-
+        // const items = [
+        //   {
+        //     icon: "el-icon-lx-home",
+        //     index: "/dashboard",
+        //     title: "系统首页",
+        //   },
+        //   {
+        //     icon: "el-icon-star-off",
+        //     index: "/project",
+        //     title: "项目列表",
+        //   },
+        //   {
+        //     icon: "el-icon-s-operation",
+        //     index: "/deployRecord",
+        //     title: "发布记录",
+        //   },
+        //   {
+        //     icon: "el-icon-lx-cascades",
+        //     index: "/ecs",
+        //     title: "服务器列表",
+        //   },
+        //   {
+        //     icon: "el-icon-lx-copy",
+        //     index: "/notice",
+        //     title: "通知列表",
+        //   },
+        //   {
+        //     icon: "el-icon-user",
+        //     index: "/user",
+        //     title: "账号列表",
+        //   },
+        //   {
+        //     icon: "el-icon-s-tools",
+        //     index: "/system",
+        //     title: "系统设置",
+        //   },
+        //   {
+        //     icon: "el-icon-s-custom",
+        //     index: "/personal",
+        //     title: "个人中心",
+        //   }
+        // ];
+        const getMenuData = () => {
+          getMenu().then((res)=> {
+            if(res.code != 200 || res.errorCode != 0 ){
+              ElMessage.error(res.errorMessage)
+              return false;
+            }
+            var menuData = []
+            Object.values(res.data).forEach((item)=> {
+              menuData.push({
+                "icon": item.icon,
+                "index": item.path,
+                "title": item.name,
+              })
+            })
+            menu.value = menuData
+          })
+        }
         const onRoutes = computed(() => {
             return route.path;
         });
 
         const store = useStore();
         const collapse = computed(() => store.state.collapse);
-
+        getMenuData()
         return {
-            items,
+            menu,
             onRoutes,
             collapse,
         };
