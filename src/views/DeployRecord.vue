@@ -25,6 +25,7 @@
                   <span v-else-if="scope.row.status == 0" style="color:green">部署中</span>
                   <span v-else-if="scope.row.status == 3" style="color:red">失败</span>
                   <span v-else-if="scope.row.status == 4" style="color:red">回滚失败</span>
+                  <span v-else-if="scope.row.status == 5" style="color:red">回滚中</span>
                   <span v-else style="color: red">已回滚</span>
                 </template>
               </el-table-column>
@@ -158,6 +159,7 @@ export default {
             type: "warning",
           })
               .then(() => {
+
                 publishBack({
                   "recordId": id
                 }).then((res)=> {

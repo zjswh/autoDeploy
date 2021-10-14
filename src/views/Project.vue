@@ -24,12 +24,13 @@
               <el-table-column label="部署方式" align="center">
                 <template #default="scope">{{ scope.row.typeName }}</template>
               </el-table-column>
+              <el-table-column label="容器标签" align="center">
+                <template #default="scope">{{ scope.row.label }}</template>
+              </el-table-column>
               <el-table-column label="部署机器" align="center">
                 <template #default="scope">
                   {{ scope.row.ecsName }}
-<!--                    <router-link :to="scope.row.ecsUrl">{{ scope.row.ecsName }}</router-link>-->
                 </template>
-
               </el-table-column>
               <el-table-column label="部署路径" align="center">
                 <template #default="scope">{{ scope.row.path }}</template>
@@ -74,20 +75,24 @@
             <el-select v-model="form.type" placeholder="请选择" clearable>
               <el-option key="ecs" label="ecs服务器" value="ecs"></el-option>
               <el-option key="k8s" label="k8s容器" value="k8s"></el-option>
+              <el-option key="rancher" label="rancher容器" value="rancher"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="部署机器" prop="ecsId">
+          <el-form-item label="容器标签" prop="label" v-if="form.type == `rancher`">
+            <el-input v-model="form.label"></el-input>
+          </el-form-item>
+          <el-form-item label="部署机器" prop="ecsId" v-if="form.type == `ecs`">
             <el-select multiple  v-model="form.ecsId" placeholder="请选择" clearable>
               <el-option v-for="item in ecsList" :key="item.ecsId" :label="item.name" :value="item.ecsId"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="部署路径" prop="path">
+          <el-form-item label="部署路径" prop="path" v-if="form.type == `ecs`">
             <el-input v-model="form.path"></el-input>
           </el-form-item>
-          <el-form-item label="使用分支" prop="branch">
+          <el-form-item label="使用分支" prop="branch" v-if="form.type == `ecs`">
             <el-input v-model="form.branch"></el-input>
           </el-form-item>
-          <el-form-item label="部署指令" prop="otherCmd">
+          <el-form-item label="部署指令" prop="otherCmd" v-if="form.type == `ecs`">
             <el-input type="textarea" rows="5" v-model="form.otherCmd"></el-input>
           </el-form-item>
         </el-form>
@@ -116,6 +121,9 @@
               <el-option key="pre" label="预发环境" value="pre"></el-option>
               <el-option key="release" label="正式环境" value="release"></el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item label="镜像地址" prop="dockerImageUid" v-if="publishForm.type != `ecs`">
+            <el-input v-model="publishForm.dockerImageUid"></el-input>
           </el-form-item>
           <el-form-item label="通知列表" prop="noticeUserId">
             <el-select v-model="publishForm.noticeUserId" placeholder="请选择" clearable>
@@ -188,6 +196,8 @@ export default {
                     list[i].typeName = "ecs服务器";
                   } else if (list[i].type == "k8s") {
                     list[i].typeName = "k8s容器";
+                  }else if (list[i].type == "rancher") {
+                    list[i].typeName = "rancher容器";
                   }else {
                     list[i].typeName = "其它";
                   }
@@ -234,7 +244,9 @@ export default {
         const publishForm = reactive({
           id: "",
           name: "",
+          type: "",
           env: "",
+          dockerImageUid: "",
           updateInfo: "",
           noticeUserId: "",
         });
@@ -265,10 +277,22 @@ export default {
             { required: true, message: "请输入名称", trigger: "blur" },
           ],
           type: [
-            { required: true, message: "请输入地址", trigger: "blur" },
+            { required: true, message: "请选择类型", trigger: "blur" },
           ],
           env: [
-            { required: true, message: "请输入端口", trigger: "blur" },
+            { required: true, message: "请输入环境", trigger: "blur" },
+          ],
+          ecsId: [
+            { required: true, message: "请输入环境", trigger: "blur" },
+          ],
+          path: [
+            { required: true, message: "请输入环境", trigger: "blur" },
+          ],
+          branch: [
+            { required: true, message: "请输入环境", trigger: "blur" },
+          ],
+          label: [
+            { required: true, message: "请输入容器标签", trigger: "blur" },
           ]
         };
 
@@ -304,6 +328,7 @@ export default {
             env: "",
             type: "",
             ecsId: "",
+            label: "",
             ecsName:"",
             path: "",
             branch: "",
@@ -314,6 +339,11 @@ export default {
           Object.keys(publishForm).forEach((item) => {
             publishForm[item] = row[item];
           });
+          if(item.type != "ecs") {
+            publishRules.dockerImageUid = [
+              { required: true, message: "请输入镜像地址", trigger: "blur" },
+            ]
+          }
           publishVisible.value = true
         }
 
@@ -322,6 +352,7 @@ export default {
         const buttonIcon = ref("");
 
         const handlePublish = () => {
+          console.log(publishForm)
           pForm.value.validate((valid) => {
             if (valid) {
               isPublish.value = true;
@@ -331,6 +362,7 @@ export default {
                 "id" : publishForm.id,
                 "updateInfo" : publishForm.updateInfo,
                 "noticeUserId" : publishForm.noticeUserId,
+                "dockerImageUid": publishForm.dockerImageUid
               }).then((res)=>{
                 if(res.code != 200 || res.errorCode != 0 ){
                   ElMessage.error(res.errorMessage)
@@ -360,6 +392,10 @@ export default {
             visible.value = true;
         };
         const saveEdit = () => {
+          console.log(form.ecsId)
+          if(form.ecsId == "" || form.ecsId == "[]") {
+              form.ecsId = [];
+            }
             editProject(form).then((res) => {
               if(res.code != 200 || res.errorCode != 0 ){
                 ElMessage.error(res.errorMessage)
