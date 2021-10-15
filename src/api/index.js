@@ -75,6 +75,46 @@ const deleteProject = query => {
     });
 }
 
+const getCluster = query => {
+    return request({
+        url: deploy.clusterList,
+        method: 'get',
+        params: query
+    });
+}
+
+const getClusterGroupByType = query => {
+    return request({
+        url: deploy.clusterGroupByType,
+        method: 'get',
+        params: query
+    });
+}
+const addCluster = query => {
+    return request({
+        url: deploy.clusterAdd,
+        method: 'post',
+        data: query,
+    });
+}
+
+const editCluster = query => {
+    return request({
+        url: deploy.clusterEdit,
+        method: 'post',
+        data: query
+    });
+}
+
+const deleteCluster = query => {
+    return request({
+        url: deploy.clusterDelete,
+        method: 'post',
+        data: query,
+        headers: { 'Content-Type': "application/x-www-form-urlencoded" }
+    });
+}
+
 const getNoticeUser = query => {
     return request({
         url: deploy.noticeUserList,
@@ -249,6 +289,11 @@ export  {
     addUser,
     editUser,
     deleteUser,
+    getClusterGroupByType,
+    getCluster,
+    addCluster,
+    editCluster,
+    deleteCluster,
     publish,
     publishBack,
     loginRecord,

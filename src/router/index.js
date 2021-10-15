@@ -25,6 +25,13 @@ const routes = [
                 },
                 component: () => import ( /* webpackChunkName: "table" */ "../views/Ecs.vue")
             }, {
+                path: "/cluster",
+                name: "cluster",
+                meta: {
+                    title: '集群管理'
+                },
+                component: () => import ( /* webpackChunkName: "table" */ "../views/Cluster.vue")
+            },{
                 path: "/project",
                 name: "project",
                 meta: {

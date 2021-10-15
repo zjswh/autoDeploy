@@ -24,6 +24,9 @@
               <el-table-column label="部署方式" align="center">
                 <template #default="scope">{{ scope.row.typeName }}</template>
               </el-table-column>
+              <el-table-column label="所属集群" align="center">
+                <template #default="scope">{{ scope.row.clusterName }}</template>
+              </el-table-column>
               <el-table-column label="容器标签" align="center">
                 <template #default="scope">{{ scope.row.label }}</template>
               </el-table-column>
@@ -78,13 +81,21 @@
               <el-option key="rancher" label="rancher容器" value="rancher"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="容器标签" prop="label" v-if="form.type == `rancher`">
-            <el-input v-model="form.label"></el-input>
-          </el-form-item>
           <el-form-item label="部署机器" prop="ecsId" v-if="form.type == `ecs`">
             <el-select multiple  v-model="form.ecsId" placeholder="请选择" clearable>
               <el-option v-for="item in ecsList" :key="item.ecsId" :label="item.name" :value="item.ecsId"></el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item label="集群" prop="clusterId" v-if="form.type == `k8s` || form.type == `rancher`">
+            <el-select v-model="form.clusterId" placeholder="请选择" clearable v-if="form.type == `k8s`">
+              <el-option v-for="item in k8sList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            </el-select>
+            <el-select v-model="form.clusterId" placeholder="请选择" clearable v-else>
+              <el-option v-for="item in rancherList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="容器标签" prop="label" v-if="form.type == `rancher` || form.type == `k8s`">
+            <el-input v-model="form.label"></el-input>
           </el-form-item>
           <el-form-item label="部署路径" prop="path" v-if="form.type == `ecs`">
             <el-input v-model="form.path"></el-input>
@@ -148,7 +159,7 @@
 <script>
 import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import {getProject, addProject, editProject, deleteProject, fetchData, publish, getNoticeUser} from "../api/index";
+import {getProject, addProject, editProject, deleteProject, fetchData, publish, getNoticeUser, getClusterGroupByType} from "../api/index";
 
 export default {
     name: "basetable",
@@ -161,6 +172,9 @@ export default {
         const tableData = ref([]);
         const pageTotal = ref(0);
         let ecsList = [];
+        const k8sList = ref([]);
+        let rancherList = ref([]);
+
         let noticeUserList = [];
       //获取ecs列表
         const getEcsList = () => {
@@ -293,6 +307,9 @@ export default {
           ],
           label: [
             { required: true, message: "请输入容器标签", trigger: "blur" },
+          ],
+          clusterId: [
+            { required: true, message: "请选择集群", trigger: "blur" },
           ]
         };
 
@@ -328,6 +345,7 @@ export default {
             env: "",
             type: "",
             ecsId: "",
+            clusterId: "",
             label: "",
             ecsName:"",
             path: "",
@@ -383,6 +401,7 @@ export default {
         }
         let idx = -1;
         const handleEdit = (index, row) => {
+            getCluster()
             title.value = "编辑";
             idx = index;
             Object.keys(form).forEach((item) => {
@@ -392,7 +411,6 @@ export default {
             visible.value = true;
         };
         const saveEdit = () => {
-          console.log(form.ecsId)
           if(form.ecsId == "" || form.ecsId == "[]") {
               form.ecsId = [];
             }
@@ -407,7 +425,19 @@ export default {
             })
         };
 
+        const getCluster = () => {
+          getClusterGroupByType().then((res)=>{
+            if(res.code != 200 || res.errorCode != 0 ){
+              ElMessage.error(res.errorMessage)
+              return false;
+            }
+            k8sList.value = res.data.k8s
+            rancherList.value = res.data.rancher
+          })
+        }
+
         const handleOpen = () => {
+          getCluster()
           //重置表单
           Object.keys(form).forEach((item) => {
             form[item] = "";
@@ -422,6 +452,7 @@ export default {
           createForm.value.validate((valid) => {
             if (valid) {
               form.id= parseInt(form.id)
+              form.clusterId= parseInt(form.clusterId)
               if(form.ecsId == "") {
                 form.ecsId = [];
               }
@@ -448,6 +479,8 @@ export default {
             publishVisible,
             noticeUserList,
             ecsList,
+            k8sList,
+            rancherList,
             title,
             query,
             tableData,
