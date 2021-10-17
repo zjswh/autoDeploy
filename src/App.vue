@@ -3,7 +3,14 @@
 </template>
 
 <script>
-export default {};
+import { connectSocket } from "./utils/ws";
+
+export default {
+  setup() {
+    connectSocket();
+    return {};
+  }
+};
 </script>
 
 <style>

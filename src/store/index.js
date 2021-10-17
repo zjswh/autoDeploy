@@ -1,4 +1,5 @@
 import {createStore} from 'vuex'
+import ws from "./ws";
 
 export default createStore({
     state: {
@@ -52,5 +53,5 @@ export default createStore({
         }
     },
     actions: {},
-    modules: {}
+    modules: { ws }
 })
