@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { connectSocket } from "./utils/ws";
+import { connectSocket } from "./utils/websocket";
 
 export default {
   setup() {

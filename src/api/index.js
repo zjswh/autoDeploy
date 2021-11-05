@@ -50,6 +50,14 @@ const getProject = query => {
     });
 }
 
+const getProjectInfo = query => {
+    return request({
+        url: deploy.projectInfo,
+        method: 'get',
+        params: query
+    });
+}
+
 const addProject = query => {
     return request({
         url: deploy.projectAdd,
@@ -278,6 +286,7 @@ export  {
     editEcs,
     deleteEcs,
     getProject,
+    getProjectInfo,
     addProject,
     editProject,
     deleteProject,

@@ -13,6 +13,7 @@ export const connectSocket = () => {
         if(result.cmd == "finished") {
             store.commit("ws/updateRecord", result)
         }
+        
         store.commit("ws/setWsRes", JSON.parse(msg.data ?? {}));
     };
     socket.onerror = function(err) {

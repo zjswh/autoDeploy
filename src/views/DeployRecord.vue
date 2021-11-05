@@ -67,6 +67,7 @@ import {useStore} from "vuex";
 
 export default {
   name: "deployRecord",
+  emits: ['reload-data'],
   setup() {
     const store = useStore();
     const query = reactive({
@@ -95,6 +96,9 @@ export default {
       });
     };
     getData();
+    const reloadData = () => {
+      context.emit('reload-data', getData())
+    }
     store.state.ws.publishRecord = tableData
     // 查询操作
     const handleSearch = () => {
@@ -149,6 +153,7 @@ export default {
       handleSearch,
       handlePageChange,
       handleBack,
+      reloadData,
     };
   },
 };
