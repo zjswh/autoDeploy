@@ -9,8 +9,12 @@
     </div>
     <div class="container">
       <div class="handle-box">
-        <el-input v-model="query.name" placeholder="项目名称" class="handle-input mr10"></el-input>
+        <el-select v-model="query.name" placeholder="项目名称" clearable filterable  class="handle-input mr10">
+          <el-option v-for="item in projectList" :key="item.name" :label="item.name" :value="item.name"></el-option>
+        </el-select>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+
+
         <el-button type="primary" icon="" style="float: right" @click="handleOpen">新建</el-button>
       </div>
       <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
@@ -184,10 +188,16 @@ export default {
       name: "",
       page: 1,
       num: 10,
+      distinct:1
     });
     const tableData = ref([]);
     const pageTotal = ref(0);
     let ecsList = [];
+    const projectList = ref([]);
+    projectList.value = [
+      {"name": "liveroom_project"},
+      {"name": "B端商城"}
+    ];
     const k8sList = ref([]);
     let rancherList = ref([]);
     const containerNameList = ref([]);
@@ -508,6 +518,7 @@ export default {
     };
 
     return {
+      projectList,
       buttonIcon,
       buttonName,
       isPublish,
