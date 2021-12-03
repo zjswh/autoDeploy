@@ -50,6 +50,13 @@ const getProject = query => {
     });
 }
 
+const getDistinctProject = () => {
+    return request({
+        url: deploy.distinctProjectList,
+        method: 'get'
+    });
+}
+
 const getProjectInfo = query => {
     return request({
         url: deploy.projectInfo,
@@ -286,6 +293,7 @@ export  {
     editEcs,
     deleteEcs,
     getProject,
+    getDistinctProject,
     getProjectInfo,
     addProject,
     editProject,

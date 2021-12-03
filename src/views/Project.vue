@@ -9,7 +9,7 @@
     </div>
     <div class="container">
       <div class="handle-box">
-        <el-select v-model="query.name" placeholder="项目名称" clearable filterable  class="handle-input mr10">
+        <el-select v-model="query.name" placeholder="项目名称" clearable filterable class="handle-input mr10">
           <el-option v-for="item in projectList" :key="item.name" :label="item.name" :value="item.name"></el-option>
         </el-select>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
@@ -172,6 +172,7 @@ import {ref, reactive} from "vue";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {
   getProject,
+  getDistinctProject,
   addProject,
   editProject,
   deleteProject,
@@ -188,16 +189,12 @@ export default {
       name: "",
       page: 1,
       num: 10,
-      distinct:1
+      distinct: 1
     });
     const tableData = ref([]);
     const pageTotal = ref(0);
     let ecsList = [];
     const projectList = ref([]);
-    projectList.value = [
-      {"name": "liveroom_project"},
-      {"name": "B端商城"}
-    ];
     const k8sList = ref([]);
     let rancherList = ref([]);
     const containerNameList = ref([]);
@@ -251,6 +248,12 @@ export default {
       });
     };
     getData();
+    const distinctProjectList = () => {
+      getDistinctProject().then((res) => {
+        projectList.value = res.data.list
+      })
+    }
+    distinctProjectList()
     const getNoticeUserList = () => {
       getNoticeUser().then((res) => {
         if (res.code != 200 || res.errorCode != 0) {
@@ -384,8 +387,8 @@ export default {
 
     const openPublish = (item, row) => {
       getProjectInfo({
-        "id":row.id
-      }).then(res=>{
+        "id": row.id
+      }).then(res => {
         if (res.code != 200 || res.errorCode != 0) {
           ElMessage.error(res.errorMessage)
           isPublish.value = false;
@@ -423,7 +426,7 @@ export default {
           buttonIcon.value = "el-icon-loading";
           publish({
             "id": publishForm.id,
-            "containerName":publishForm.containerName,
+            "containerName": publishForm.containerName,
             "updateInfo": publishForm.updateInfo,
             "noticeUserId": publishForm.noticeUserId,
             "dockerImageUid": publishForm.dockerImageUid
@@ -517,7 +520,9 @@ export default {
       });
     };
 
+
     return {
+      distinctProjectList,
       projectList,
       buttonIcon,
       buttonName,
