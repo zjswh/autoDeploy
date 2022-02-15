@@ -109,7 +109,7 @@
           <el-input v-model="form.branch"></el-input>
         </el-form-item>
         <el-form-item label="部署指令" prop="otherCmd" v-if="form.type == `ecs`">
-          <el-input type="textarea" rows="5" v-model="form.otherCmd"></el-input>
+          <el-input type="textarea" rows="5" v-model="form.otherCmd" placeholder="使用非系统自带命令时 确保/usr/bin目录下存在该指令"></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
