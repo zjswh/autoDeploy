@@ -13,6 +13,11 @@
                       <el-form-item label="公司名" prop="company">
                         <el-input v-model="form.company" ></el-input>
                       </el-form-item>
+                      <el-form-item label="环境配置" prop="env" @change="changeEnv">
+                        <el-radio v-model="form.env" label="test">测试环境</el-radio>
+                        <el-radio v-model="form.env" label="pre">预发环境</el-radio>
+                        <el-radio v-model="form.env" label="release">正式服环境</el-radio>
+                      </el-form-item>
                       <el-form-item label="通知邮箱" prop="noticeEmail">
                         <el-input v-model="form.noticeEmail" ></el-input>
                       </el-form-item>
@@ -51,7 +56,7 @@ export default {
     name: "publisher",
     setup() {
       let isAdmin = ref(0);
-
+      let envConfig = {};
       const checkAdmin = () => {
           getLoginInfo().then((res) => {
             if(res.code != 200 || res.errorCode != 0 ){
@@ -69,7 +74,8 @@ export default {
           noticeEmail: "",
           wechatWebHook: "",
           emailSwitch: "",
-          wechatSwitch: ""
+          wechatSwitch: "",
+          env: ""
         });
 
         const getData = () => {
@@ -78,22 +84,35 @@ export default {
               ElMessage.error(res.errorMessage)
               return false;
             }
-            Object.keys(form).forEach((v)=> {
-              if(v == "emailSwitch" || v == "wechatSwitch") {
-                form[v] = !!parseInt(res.data[v])
-              } else {
-                form[v] = res.data[v]
-              }
-            })
+            envConfig = res.data.env
+            form.env = "test"
+            if(envConfig[form.env]) {
+              form.noticeEmail = envConfig[form.env].noticeEmail;
+              form.wechatWebHook = envConfig[form.env].wechatWebHook;
+              form.emailSwitch = !!parseInt(envConfig[form.env].emailSwitch);
+              form.wechatSwitch = !!parseInt(envConfig[form.env].wechatSwitch);
+            }
+            form.company = res.data.sys.company
           })
         }
 
         checkAdmin()
         getData()
         const updateSystemConfig = () => {
-          form.emailSwitch = form.emailSwitch === true ? "1" : "0";
-          form.wechatSwitch = form.wechatSwitch === true ? "1" : "0";
-          updateConfig(form).then((res) => {
+          form.emailSwitch = form.emailSwitch === true ? 1 : 0;
+          form.wechatSwitch = form.wechatSwitch === true ? 1 : 0;
+          updateConfig({
+            "sys": {
+              "company": form.company
+            },
+            "env": {
+              "noticeEmail": form.noticeEmail,
+              "wechatWebHook": form.wechatWebHook,
+              "emailSwitch": form.emailSwitch,
+              "wechatSwitch": form.wechatSwitch,
+            },
+            "chooseEnv": form.env
+          }).then((res) => {
             if(res.code != 200 || res.errorCode != 0 ){
               ElMessage.error(res.errorMessage)
               return false;
@@ -102,10 +121,21 @@ export default {
             getData();
           })
         }
+
+        const changeEnv = () =>{
+          if(envConfig[form.env]) {
+            form.noticeEmail = envConfig[form.env].noticeEmail;
+            form.wechatWebHook = envConfig[form.env].wechatWebHook;
+            form.emailSwitch = !!parseInt(envConfig[form.env].emailSwitch);
+            form.wechatSwitch = !!parseInt(envConfig[form.env].wechatSwitch);
+          }
+        }
+
         return {
           isAdmin,
           form,
-          updateSystemConfig
+          updateSystemConfig,
+          changeEnv
         };
     },
 };
