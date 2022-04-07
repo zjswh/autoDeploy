@@ -100,7 +100,9 @@
           </el-select>
         </el-form-item>
         <el-form-item label="容器标签" prop="label" v-if="form.type == `rancher` || form.type == `k8s`">
-          <el-input v-model="form.label"></el-input>
+          <el-select v-model="form.label" placeholder="请选择" clearable filterable>
+            <el-option v-for="(kname, item) in tagList[form.clusterId]" :key="kname" :label="kname" :value="item"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="部署路径" prop="path" v-if="form.type == `ecs`">
           <el-input v-model="form.path"></el-input>
@@ -171,6 +173,7 @@
 import {ref, reactive} from "vue";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {
+  getTagList,
   getProject,
   getDistinctProject,
   addProject,
@@ -194,12 +197,25 @@ export default {
     const tableData = ref([]);
     const pageTotal = ref(0);
     let ecsList = [];
+    const tagList = ref();
     const projectList = ref([]);
     const k8sList = ref([]);
     let rancherList = ref([]);
     const containerNameList = ref([]);
 
     let noticeUserList = [];
+
+    const _getTagList = () => {
+      getTagList().then((res) => {
+        if (res.code != 200 || res.errorCode != 0) {
+          ElMessage.error(res.errorMessage)
+          return false;
+        }
+        tagList.value = res.data
+      })
+    }
+    _getTagList()
+
     //获取ecs列表
     const getEcsList = () => {
       fetchData().then((res) => {
@@ -533,6 +549,7 @@ export default {
       containerNameList,
       ecsList,
       k8sList,
+      tagList,
       rancherList,
       title,
       query,

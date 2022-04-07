@@ -9,6 +9,7 @@ export const deploy = {
     clusterAdd: `/api/service/clusterAdd`,
     clusterEdit: `/api/service/clusterEdit`,
     clusterDelete: `/api/service/clusterDelete`,
+    getTagList: `/api/service/getTagList`,
     projectList: `/api/service/projectList`,
     distinctProjectList: `/api/service/distinctProjectList`,
     projectInfo: `/api/service/projectInfo`,

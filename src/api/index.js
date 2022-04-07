@@ -42,6 +42,14 @@ const deleteEcs = query => {
     });
 }
 
+const getTagList = query => {
+    return request({
+        url: deploy.getTagList,
+        method: 'get',
+        params: query
+    });
+}
+
 const getProject = query => {
     return request({
         url: deploy.projectList,
@@ -321,7 +329,8 @@ export  {
     updateAva,
     saveUserInfoApi,
     updatePassword,
-    getMenu
+    getMenu,
+    getTagList
 }
 
 
