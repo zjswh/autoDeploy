@@ -35,4 +35,16 @@ export const deploy = {
     updateConfig: `/api/service/updateSystemConfig`,
     updatePassword: `/api/service/updatePassword`,
     getMenu: `/api/service/getMenu`,
+    getAdminMenu: `/api/service/getAdminMenu`,
+    roleList: `/api/service/roleList`,
+    roleAdd: `/api/service/roleAdd`,
+    roleEdit: `/api/service/roleEdit`,
+    roleDelete: `/api/service/roleDelete`,
+    resourceList: `/api/service/resourceList`,
+    allMenuResource: `/api/service/allMenuResource`,
+    resourceAdd: `/api/service/resourceAdd`,
+    resourceEdit: `/api/service/resourceEdit`,
+    resourceDelete: `/api/service/resourceDelete`,
+    resourceStatus: `/api/service/setResourceStatus`,
+
 }

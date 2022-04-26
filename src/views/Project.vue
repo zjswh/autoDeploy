@@ -15,7 +15,7 @@
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
 
 
-        <el-button type="primary" icon="" style="float: right" @click="handleOpen">新建</el-button>
+        <el-button type="primary" icon="" style="float: right" @click="handleOpen" v-show="buttonVisibility.create">新建</el-button>
       </div>
       <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
         <el-table-column prop="id" label="ID" width="80" align="center">
@@ -50,12 +50,12 @@
         </el-table-column>
         <el-table-column label="操作" width="220" align="center">
           <template #default="scope">
-            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
+            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-show="buttonVisibility.edit">编辑
             </el-button>
-            <el-button type="text" icon="el-icon-setting" @click="openPublish(scope.$index, scope.row)">发布
+            <el-button type="text" icon="el-icon-setting" @click="openPublish(scope.$index, scope.row)" v-show="buttonVisibility.publish">发布
             </el-button>
             <el-button type="text" icon="el-icon-delete" class="red"
-                       @click="handleDelete(scope.row.id)">删除
+                       @click="handleDelete(scope.row.id)" v-show="buttonVisibility.delete">删除
             </el-button>
           </template>
         </el-table-column>
@@ -184,6 +184,7 @@ import {
   getNoticeUser,
   getClusterGroupByType, getProjectInfo
 } from "../api/index";
+import {getButtonList} from "../utils/tools";
 
 export default {
   name: "basetable",
@@ -204,7 +205,17 @@ export default {
     const containerNameList = ref([]);
 
     let noticeUserList = [];
-
+    const buttonVisibility = ref({
+      create: false,
+      edit: false,
+      delete: false,
+      publish: false
+    });
+    getButtonList("/project").then(res =>{
+      Object.values(res).forEach(item => {
+        buttonVisibility.value[item.buttonType] = true;
+      });
+    });
     const _getTagList = () => {
       getTagList().then((res) => {
         if (res.code != 200 || res.errorCode != 0) {
@@ -563,6 +574,7 @@ export default {
       pForm,
       form,
       rules,
+      buttonVisibility,
       handlePublish,
       handleSearch,
       handleCreate,

@@ -11,7 +11,7 @@
             <div class="handle-box">
                 <el-input v-model="query.name" placeholder="姓名" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="primary" icon="" style="float: right" @click="handleOpen">新建</el-button>
+                <el-button type="primary" icon="" style="float: right" @click="handleOpen" v-if="buttonVisibility.create">新建</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="id" label="ID" width="80" align="center">
@@ -27,6 +27,9 @@
               <el-table-column label="职位" align="center">
                 <template #default="scope">{{ scope.row.job }}</template>
               </el-table-column>
+              <el-table-column label="角色" align="center">
+                <template #default="scope">{{ scope.row.roleName }}</template>
+              </el-table-column>
               <el-table-column label="邮箱" width="250" align="center">
                 <template #default="scope">{{ scope.row.email }}</template>
               </el-table-column>
@@ -38,10 +41,10 @@
               </el-table-column>
               <el-table-column label="操作" width="180" align="center">
                 <template #default="scope">
-                  <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
+                  <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="buttonVisibility.edit">编辑
                   </el-button>
                   <el-button type="text" icon="el-icon-delete" class="red"
-                             @click="handleDelete(scope.row.id)">删除</el-button>
+                             @click="handleDelete(scope.row.id)" v-if="buttonVisibility.delete">删除</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -65,6 +68,11 @@
           </el-form-item>
           <el-form-item label="职位" prop="job">
             <el-input v-model="form.job"></el-input>
+          </el-form-item>
+          <el-form-item label="角色" prop="roleId">
+            <el-select v-model="form.roleId" placeholder="请选择" clearable>
+              <el-option v-for="(key, item) in roleMap" :key="key" :label="key" :value="item"></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="form.email"></el-input>
@@ -91,7 +99,8 @@
 <script>
 import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import {getUser, addUser, editUser, deleteUser} from "../api/index";
+import {getButtonList} from "../utils/tools";
+import {getUser, addUser, editUser, deleteUser, getRole} from "../api/index";
 
 export default {
     name: "user",
@@ -103,14 +112,28 @@ export default {
         });
         const tableData = ref([]);
         const pageTotal = ref(0);
+        const roleMap = ref({});
+        const buttonVisibility = ref({
+              create: false,
+              edit: false,
+              delete: false,
+        });
+        getButtonList("/user").then(res =>{
+          Object.values(res).forEach(item => {
+            buttonVisibility.value[item.buttonType] = true;
+          });
+        });
         // 获取表格数据
         const getData = () => {
             getUser(query).then((res) => {
-                tableData.value = res.data.list;
+                const tmpList = res.data.list;
+                Object.values(tmpList).forEach(item => {
+                  item.roleName = roleMap.value[item.roleId] || "其它";
+                })
+                tableData.value = tmpList;
                 pageTotal.value = res.data.count || 0;
             });
         };
-        getData();
 
         // 查询操作
         const handleSearch = () => {
@@ -182,18 +205,19 @@ export default {
             emailKey: "",
             password: "",
             job: "",
+            roleId: "",
         });
-        let idx = -1;
         const handleEdit = (index, row) => {
             title.value = "编辑";
-            idx = index;
             Object.keys(form).forEach((item) => {
                 form[item] = row[item];
             });
+            form.roleId = form.roleId.toString();
             isNew.value = false;
             visible.value = true;
         };
         const saveEdit = () => {
+            form.roleId = parseInt(form.roleId)
             editUser(form).then((res) => {
               if(res.code != 200 || res.errorCode != 0 ){
                 ElMessage.error(res.errorMessage)
@@ -221,6 +245,7 @@ export default {
             if (valid) {
               form.ecsId = parseInt(form.ecsId)
               form.id= parseInt(form.id)
+              form.roleId = parseInt(form.roleId)
               addUser(form).then((res)=>{
                 if(res.code != 200 || res.errorCode != 0 ){
                   ElMessage.error(res.errorMessage)
@@ -236,7 +261,20 @@ export default {
           });
         };
 
+        const loadRoleList = () => {
+          getRole(query).then(res => {
+            const tmpMap = {};
+            Object.values(res.data.list).forEach(item=>{
+              tmpMap[item.id] = item.name;
+            })
+            roleMap.value = tmpMap;
+          })
+        }
+        loadRoleList();
+        getData();
         return {
+          buttonVisibility,
+            roleMap,
             title,
             query,
             tableData,

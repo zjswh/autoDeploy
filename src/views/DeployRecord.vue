@@ -16,6 +16,9 @@
         <el-table-column label="发布环境" align="center">
           <template #default="scope">{{ scope.row.envName }}</template>
         </el-table-column>
+        <el-table-column label="发布者" align="center">
+          <template #default="scope">{{ scope.row.user }}</template>
+        </el-table-column>
         <el-table-column label="更新内容">
           <template #default="scope">{{ scope.row.updateInfo }}</template>
         </el-table-column>
@@ -34,10 +37,10 @@
         </el-table-column>
         <el-table-column label="操作" width="180" align="center">
           <template #default="scope">
-            <el-button type="text" icon="" @click="handleOpen(scope.$index, scope.row)">查看部署详情
+            <el-button type="text" icon="" @click="handleOpen(scope.$index, scope.row)" v-show="buttonVisibility.read">查看部署详情
             </el-button>
-            <el-button type="text" icon="el-icon-delete" v-show="scope.row.status == 1" class="red"
-                       @click="handleBack(scope.row.id)">回滚
+            <el-button type="text" icon="el-icon-delete" v-show="scope.row.status == 1 && buttonVisibility.rollback" class="red"
+                       @click="handleBack(scope.row.id)" >回滚
             </el-button>
           </template>
         </el-table-column>
@@ -64,6 +67,7 @@ import {ElMessage, ElMessageBox} from "element-plus";
 import {deployRecord, publishBack} from "../api/index";
 import {dateFormat} from "../utils/time"
 import {useStore} from "vuex";
+import {getButtonList} from "../utils/tools";
 
 export default {
   name: "deployRecord",
@@ -77,7 +81,15 @@ export default {
     const visible = ref(false);
     const tableData = ref([]);
     const pageTotal = ref(0);
-
+    const buttonVisibility = ref({
+      read: false,
+      rollback: false,
+    });
+    getButtonList("/deployRecord").then(res =>{
+      Object.values(res).forEach(item => {
+        buttonVisibility.value[item.buttonType] = true;
+      });
+    });
     // 获取表格数据
     const getData = () => {
       deployRecord(query).then((res) => {
@@ -148,6 +160,7 @@ export default {
       query,
       tableData,
       pageTotal,
+      buttonVisibility,
       handleOpen,
       dateFormat,
       handleSearch,

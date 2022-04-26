@@ -35,62 +35,16 @@
 import { computed, watch, ref } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
-import {getMenu} from "../api/index"
-import {ElMessage} from "element-plus";
+import {getMenuList} from "../utils/tools";
+
 export default {
     setup() {
         const menu = ref([]);
         const route = useRoute();
-        // const items = [
-        //   {
-        //     icon: "el-icon-lx-home",
-        //     index: "/dashboard",
-        //     title: "系统首页",
-        //   },
-        //   {
-        //     icon: "el-icon-star-off",
-        //     index: "/project",
-        //     title: "项目列表",
-        //   },
-        //   {
-        //     icon: "el-icon-s-operation",
-        //     index: "/deployRecord",
-        //     title: "发布记录",
-        //   },
-        //   {
-        //     icon: "el-icon-lx-cascades",
-        //     index: "/ecs",
-        //     title: "服务器列表",
-        //   },
-        //   {
-        //     icon: "el-icon-lx-copy",
-        //     index: "/notice",
-        //     title: "通知列表",
-        //   },
-        //   {
-        //     icon: "el-icon-user",
-        //     index: "/user",
-        //     title: "账号列表",
-        //   },
-        //   {
-        //     icon: "el-icon-s-tools",
-        //     index: "/system",
-        //     title: "系统设置",
-        //   },
-        //   {
-        //     icon: "el-icon-s-custom",
-        //     index: "/personal",
-        //     title: "个人中心",
-        //   }
-        // ];
         const getMenuData = () => {
-          getMenu().then((res)=> {
-            if(res.code != 200 || res.errorCode != 0 ){
-              ElMessage.error(res.errorMessage)
-              return false;
-            }
+          getMenuList().then(res => {
             var menuData = []
-            Object.values(res.data).forEach((item)=> {
+            Object.values(res).forEach((item)=> {
               menuData.push({
                 "icon": item.icon,
                 "index": item.path,
@@ -100,6 +54,7 @@ export default {
             menu.value = menuData
           })
         }
+
         const onRoutes = computed(() => {
             return route.path;
         });

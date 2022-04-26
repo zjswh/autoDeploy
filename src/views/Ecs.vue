@@ -12,7 +12,7 @@
                 <el-input v-model="query.name" placeholder="名称" class="handle-input mr10"></el-input>
                 <el-input v-model="query.address" placeholder="ip地址" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="primary" icon=""  style="float: right" @click="handleOpen">新建</el-button>
+                <el-button type="primary" icon=""  style="float: right" @click="handleOpen" v-show="buttonVisibility.create">新建</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="id" label="ID" width="55" align="center">
@@ -33,10 +33,10 @@
               </el-table-column>
                 <el-table-column label="操作" width="180" align="center">
                     <template #default="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
+                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-show="buttonVisibility.edit">编辑
                         </el-button>
                         <el-button type="text" icon="el-icon-delete" class="red"
-                            @click="handleDelete(scope.row.id)">删除</el-button>
+                            @click="handleDelete(scope.row.id)" v-show="buttonVisibility.delete">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -82,6 +82,7 @@ import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {fetchData, addEcs, editEcs, deleteEcs} from "../api/index";
 import {useRoute} from "vue-router"
+import {getButtonList} from "../utils/tools";
 
 export default {
     name: "basetable",
@@ -96,6 +97,16 @@ export default {
         });
         const tableData = ref([]);
         const pageTotal = ref(0);
+        const buttonVisibility = ref({
+          create: false,
+          edit: false,
+          delete: false,
+        });
+        getButtonList("/ecs").then(res =>{
+          Object.values(res).forEach(item => {
+            buttonVisibility.value[item.buttonType] = true;
+          });
+        });
         // 获取表格数据
         const getData = () => {
             fetchData(query).then((res) => {
@@ -232,6 +243,7 @@ export default {
             createForm,
             form,
             rules,
+            buttonVisibility,
             handleSearch,
             handleCreate,
             handleOpen,

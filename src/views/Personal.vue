@@ -60,7 +60,7 @@
                         <el-input v-model="userForm.job"></el-input>
                       </el-form-item>
                       <el-form-item>
-                        <el-button type="primary"  @click="saveUserInfo">保存</el-button>
+                        <el-button type="primary"  @click="saveUserInfo" v-show="buttonVisibility.saveInfo">保存</el-button>
                       </el-form-item>
                     </el-form>
                 </el-card>
@@ -82,7 +82,7 @@
                     <el-input type="password" v-model="form.new"></el-input>
                   </el-form-item>
                   <el-form-item>
-                    <el-button type="primary" @click="savePassword">保存</el-button>
+                    <el-button type="primary" @click="savePassword" v-show="buttonVisibility.savePasw">保存</el-button>
                   </el-form-item>
                 </el-form>
               </el-card>
@@ -98,7 +98,7 @@
                     <el-button class="crop-demo-btn" type="primary">选择图片
                         <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage" />
                     </el-button>
-                    <el-button type="primary" @click="saveAvatar">上传并保存</el-button>
+                    <el-button type="primary" @click="saveAvatar" v-show="buttonVisibility.saveAva">上传并保存</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -112,6 +112,7 @@ import "cropperjs/dist/cropper.css";
 import avatar from "../assets/img/img.jpg";
 import {getLoginInfo, updateAva, saveUserInfoApi, updatePassword} from "../api/index";
 import {ElMessage} from "element-plus";
+import {getButtonList} from "../utils/tools";
 
 
 export default {
@@ -162,7 +163,16 @@ export default {
           ],
         };
         const avatarImg = ref(avatar);
-
+        const buttonVisibility = ref({
+          saveInfo: false,
+          saveAva: false,
+          savePasw: false,
+        });
+        getButtonList("/personal").then(res =>{
+          Object.values(res).forEach(item => {
+            buttonVisibility.value[item.buttonType] = true;
+          });
+        });
         const getLogin = () => {
           getLoginInfo().then((res) => {
             if(res.code != 200 || res.errorCode != 0 ){
@@ -276,6 +286,7 @@ export default {
             cropImg,
             showDialog,
             dialogVisible,
+            buttonVisibility,
             setImage,
             cropImage,
             saveAvatar,

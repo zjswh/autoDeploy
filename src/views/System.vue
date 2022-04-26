@@ -39,7 +39,7 @@
                         </el-switch>
                       </el-form-item>
                       <el-form-item>
-                          <el-button type="primary" v-show="isAdmin" @click="updateSystemConfig">修改</el-button>
+                          <el-button type="primary" v-show="isAdmin || buttonVisibility.update" @click="updateSystemConfig" >修改</el-button>
                       </el-form-item>
                 </el-form>
             </div>
@@ -51,12 +51,21 @@
 import { reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
 import {getSystemConfig, getLoginInfo, updateConfig} from "../api/index";
+import {getButtonList} from "../utils/tools";
 
 export default {
     name: "publisher",
     setup() {
       let isAdmin = ref(0);
       let envConfig = {};
+      const buttonVisibility = ref({
+        update: false
+      });
+      getButtonList("/system").then(res =>{
+        Object.values(res).forEach(item => {
+          buttonVisibility.value[item.buttonType] = true;
+        });
+      });
       const checkAdmin = () => {
           getLoginInfo().then((res) => {
             if(res.code != 200 || res.errorCode != 0 ){
@@ -134,6 +143,7 @@ export default {
         return {
           isAdmin,
           form,
+          buttonVisibility,
           updateSystemConfig,
           changeEnv
         };

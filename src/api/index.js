@@ -204,6 +204,90 @@ const deleteUser = query => {
     });
 }
 
+const getRole = query => {
+    return request({
+        url: deploy.roleList,
+        method: 'get',
+        params: query
+    });
+}
+
+const addRole = query => {
+    return request({
+        url: deploy.roleAdd,
+        method: 'post',
+        data: query,
+    });
+}
+
+const editRole = query => {
+    return request({
+        url: deploy.roleEdit,
+        method: 'post',
+        data: query
+    });
+}
+
+const deleteRole = query => {
+    return request({
+        url: deploy.roleDelete,
+        method: 'post',
+        data: query,
+        headers: { 'Content-Type': "application/x-www-form-urlencoded" }
+    });
+}
+
+const getResource = query => {
+    return request({
+        url: deploy.resourceList,
+        method: 'get',
+        params: query
+    });
+}
+
+const getAllMenuResource = query => {
+    return request({
+        url: deploy.allMenuResource,
+        method: 'get',
+        params: query
+    });
+}
+
+const addResource = query => {
+    return request({
+        url: deploy.resourceAdd,
+        method: 'post',
+        data: query,
+    });
+}
+
+const editResource = query => {
+    return request({
+        url: deploy.resourceEdit,
+        method: 'post',
+        data: query
+    });
+}
+
+const deleteResource = query => {
+    return request({
+        url: deploy.resourceDelete,
+        method: 'post',
+        data: query,
+        headers: { 'Content-Type': "application/x-www-form-urlencoded" }
+    });
+}
+
+const setResourceStatus = query => {
+    return request({
+        url: deploy.resourceStatus,
+        method: 'post',
+        data: query,
+        headers: { 'Content-Type': "application/x-www-form-urlencoded" }
+    });
+}
+
+
 const publish = query => {
     return request({
         url: deploy.publish,
@@ -293,6 +377,13 @@ const getMenu = () => {
     });
 }
 
+const getAdminMenu = () => {
+    return request({
+        url: deploy.getAdminMenu,
+        method: 'get',
+    });
+}
+
 
 export  {
     fetchData,
@@ -330,7 +421,18 @@ export  {
     saveUserInfoApi,
     updatePassword,
     getMenu,
-    getTagList
+    getAdminMenu,
+    getTagList,
+    getRole,
+    addRole,
+    editRole,
+    deleteRole,
+    getResource,
+    addResource,
+    editResource,
+    deleteResource,
+    setResourceStatus,
+    getAllMenuResource
 }
 
 

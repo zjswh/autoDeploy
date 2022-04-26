@@ -11,7 +11,7 @@
             <div class="handle-box">
                 <el-input v-model="query.name" placeholder="姓名" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
-                <el-button type="primary" style="float: right" icon="" @click="handleOpen">新建</el-button>
+                <el-button type="primary" style="float: right" icon="" @click="handleOpen" v-show="buttonVisibility.create">新建</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" header-cell-class-name="table-header">
                 <el-table-column prop="id" label="ID" width="80" align="center">
@@ -60,6 +60,7 @@
 import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import {getNoticeUser, addNoticeUser, editNoticeUser, deleteNoticeUser} from "../api/index";
+import {getButtonList} from "../utils/tools";
 
 export default {
     name: "basetable",
@@ -71,6 +72,14 @@ export default {
         });
         const tableData = ref([]);
         const pageTotal = ref(0);
+        const buttonVisibility = ref({
+          create: false,
+        });
+        getButtonList("/notice").then(res =>{
+          Object.values(res).forEach(item => {
+            buttonVisibility.value[item.buttonType] = true;
+          });
+        });
         // 获取表格数据
         const getData = () => {
             getNoticeUser(query).then((res) => {
@@ -198,6 +207,7 @@ export default {
             createForm,
             form,
             rules,
+            buttonVisibility,
             handleSearch,
             handleCreate,
             handleOpen,

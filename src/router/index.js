@@ -52,6 +52,20 @@ const routes = [
                     title: '账号列表'
                 },
                 component: () => import ( /* webpackChunkName: "user" */ "../views/User.vue")
+            }, {
+                path: "/role",
+                name: "role",
+                meta: {
+                    title: '角色列表'
+                },
+                component: () => import ( /* webpackChunkName: "user" */ "../views/Role.vue")
+            }, {
+                path: "/resource",
+                name: "resource",
+                meta: {
+                    title: '角色列表'
+                },
+                component: () => import ( /* webpackChunkName: "user" */ "../views/Resource.vue")
             },{
                 path: "/publisher",
                 name: "publisher",
@@ -80,22 +94,7 @@ const routes = [
                     title: 'tab标签'
                 },
                 component: () => import ( /* webpackChunkName: "tabs" */ "../views/Tabs.vue")
-            }, {
-                path: "/donate",
-                name: "donate",
-                meta: {
-                    title: '鼓励作者'
-                },
-                component: () => import ( /* webpackChunkName: "donate" */ "../views/Donate.vue")
-            }, {
-                path: "/permission",
-                name: "permission",
-                meta: {
-                    title: '权限管理',
-                    permission: true
-                },
-                component: () => import ( /* webpackChunkName: "permission" */ "../views/Permission.vue")
-            }, {
+            },{
                 path: "/i18n",
                 name: "i18n",
                 meta: {
